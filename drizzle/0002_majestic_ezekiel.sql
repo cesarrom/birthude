@@ -1,0 +1,1 @@
+ALTER TABLE "invitees" ADD COLUMN "experience" jsonb;

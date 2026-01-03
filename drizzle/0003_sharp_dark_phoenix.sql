@@ -1,0 +1,1 @@
+ALTER TABLE "invitees" ADD COLUMN "has_seen" boolean DEFAULT false NOT NULL;

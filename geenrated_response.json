@@ -1,0 +1,1168 @@
+{
+    "experience": {
+        "$ref": "#/definitions/ExperienceSchema",
+        "definitions": {
+            "ExperienceSchema": {
+                "id": "luna-rewind-cesar",
+                "title": "Rewind Invite for Cesar Leon",
+                "screens": [
+                    {
+                        "id": "screen_1",
+                        "name": "Greeting",
+                        "title": "¡Hola, Cesar Leon!",
+                        "text": "Luna Leon te invita a una Fiesta en la piscina — ven a celebrar bajo el sol. Preparate para risas, chapuzones y buena onda.",
+                        "actors": [
+                            {
+                                "id": "bg",
+                                "type": "image",
+                                "assetId": "img_0"
+                            },
+                            {
+                                "id": "poolIcon",
+                                "type": "image",
+                                "assetId": "img_1"
+                            },
+                            {
+                                "id": "title",
+                                "type": "text",
+                                "content": "¡Hola, Cesar Leon!"
+                            },
+                            {
+                                "id": "body",
+                                "type": "text",
+                                "content": "Luna Leon te invita a una Fiesta en la piscina — ven a celebrar bajo el sol. Preparate para risas, chapuzones y buena onda."
+                            },
+                            {
+                                "id": "confetti",
+                                "type": "emoji",
+                                "content": "🎉"
+                            }
+                        ],
+                        "layout": {
+                            "bg": {
+                                "top": "0px",
+                                "left": "0px",
+                                "width": "100%",
+                                "height": "100%",
+                                "opacity": 1,
+                                "zIndex": 0
+                            },
+                            "poolIcon": {
+                                "top": "20px",
+                                "left": "calc(50% - 48px)",
+                                "width": "96px",
+                                "opacity": 0.95,
+                                "zIndex": 1
+                            },
+                            "title": {
+                                "top": "140px",
+                                "left": "40px",
+                                "width": "calc(100% - 80px)",
+                                "fontSize": "28px",
+                                "fontWeight": 700,
+                                "color": "#073B6D",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "body": {
+                                "top": "180px",
+                                "left": "40px",
+                                "width": "calc(100% - 80px)",
+                                "fontSize": "16px",
+                                "color": "#1b3f6b",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "confetti": {
+                                "top": "20px",
+                                "left": "20px",
+                                "fontSize": "28px",
+                                "opacity": 0
+                            }
+                        },
+                        "actions": {
+                            "bg": {
+                                "entrance": [
+                                    {
+                                        "to": {
+                                            "opacity": 1
+                                        },
+                                        "duration": 0.6
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "poolIcon": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.6,
+                                            "y": -10,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.8,
+                                            "ease": "back.out(1.2)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "y": 6
+                                        },
+                                        "duration": 1.6,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.5
+                                    }
+                                ]
+                            },
+                            "title": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": -18,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.7,
+                                            "delay": 0.15,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -12,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "body": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.7,
+                                            "delay": 0.35,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "confetti": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.4,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "opacity": 1,
+                                            "duration": 0.5,
+                                            "delay": 0.5,
+                                            "ease": "elastic.out(1,0.6)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "rotate": 18
+                                        },
+                                        "duration": 1.2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.3
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "screen_2",
+                        "name": "Date",
+                        "title": "Guarda la fecha, Cesar Leon",
+                        "text": "10 de enero de 2026 a las 13:00 — un mediodía perfecto para zambullidas y pastel. Apuntalo en tu calendario.",
+                        "actors": [
+                            {
+                                "id": "sunIcon",
+                                "type": "image",
+                                "assetId": "img_3"
+                            },
+                            {
+                                "id": "dateTitle",
+                                "type": "text",
+                                "content": "Guarda la fecha, Cesar Leon"
+                            },
+                            {
+                                "id": "dateBody",
+                                "type": "text",
+                                "content": "10 de enero de 2026 a las 13:00 — un mediodía perfecto para zambullidas y pastel. Apuntalo en tu calendario."
+                            },
+                            {
+                                "id": "calendarEmoji",
+                                "type": "emoji",
+                                "content": "📅"
+                            }
+                        ],
+                        "layout": {
+                            "sunIcon": {
+                                "top": "18px",
+                                "left": "calc(50% - 40px)",
+                                "width": "80px",
+                                "opacity": 0.95,
+                                "zIndex": 1
+                            },
+                            "dateTitle": {
+                                "top": "120px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "24px",
+                                "fontWeight": 700,
+                                "color": "#e85b5b",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "dateBody": {
+                                "top": "160px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "15px",
+                                "color": "#6b3b3b",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "calendarEmoji": {
+                                "top": "56px",
+                                "left": "18px",
+                                "fontSize": "26px",
+                                "opacity": 0
+                            }
+                        },
+                        "actions": {
+                            "sunIcon": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.7,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "opacity": 1,
+                                            "duration": 0.7,
+                                            "ease": "expo.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "rotate": 6
+                                        },
+                                        "duration": 2.2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "scale": 0.6,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "dateTitle": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": -14,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.15,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "dateBody": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": 12,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.3,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "calendarEmoji": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "x": -8,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "x": 0,
+                                            "opacity": 1,
+                                            "duration": 0.5,
+                                            "delay": 0.45,
+                                            "ease": "back.out(1.1)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "y": -6
+                                        },
+                                        "duration": 1.4,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.3
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "screen_3",
+                        "name": "Details",
+                        "title": "Sumérgete, Cesar Leon",
+                        "text": "Tema: Fiesta en la piscina! Lugar: Enrique Carbó Ortiz 500, La Reja Centro — habrá sol, música y mucha buena onda. Ven listo para disfrutar.",
+                        "actors": [
+                            {
+                                "id": "frameIcon",
+                                "type": "image",
+                                "assetId": "img_2"
+                            },
+                            {
+                                "id": "detailTitle",
+                                "type": "text",
+                                "content": "Sumérgete, Cesar Leon"
+                            },
+                            {
+                                "id": "detailBody",
+                                "type": "text",
+                                "content": "Tema: Fiesta en la piscina! Lugar: Enrique Carbó Ortiz 500, La Reja Centro — habrá sol, música y mucha buena onda. Ven listo para disfrutar."
+                            }
+                        ],
+                        "layout": {
+                            "frameIcon": {
+                                "top": "18px",
+                                "left": "calc(50% - 48px)",
+                                "width": "96px",
+                                "opacity": 0.98,
+                                "zIndex": 1
+                            },
+                            "detailTitle": {
+                                "top": "130px",
+                                "left": "40px",
+                                "width": "calc(100% - 80px)",
+                                "fontSize": "22px",
+                                "fontWeight": 700,
+                                "color": "#0b6b4a",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "detailBody": {
+                                "top": "170px",
+                                "left": "40px",
+                                "width": "calc(100% - 80px)",
+                                "fontSize": "15px",
+                                "color": "#164b36",
+                                "opacity": 0,
+                                "zIndex": 2
+                            }
+                        },
+                        "actions": {
+                            "frameIcon": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.8,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "opacity": 1,
+                                            "duration": 0.7,
+                                            "ease": "back.out(1.2)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "scale": 1.03
+                                        },
+                                        "duration": 2.6,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "detailTitle": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": -16,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.15,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -12,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "detailBody": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": 12,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.3,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "screen_4",
+                        "name": "Items",
+                        "title": "Traé esto, Cesar Leon",
+                        "text": "Para que la mesa quede perfecta: Gaseosas, jugo, agua, papas fritas, pochoclo, galletitas, pizzetas, torta y protector solar. Todo suma y todo se comparte.",
+                        "actors": [
+                            {
+                                "id": "poolFrame",
+                                "type": "image",
+                                "assetId": "img_4"
+                            },
+                            {
+                                "id": "itemsTitle",
+                                "type": "text",
+                                "content": "Traé esto, Cesar Leon"
+                            },
+                            {
+                                "id": "itemsBody",
+                                "type": "text",
+                                "content": "Para que la mesa quede perfecta: Gaseosas, jugo, agua, papas fritas, pochoclo, galletitas, pizzetas, torta y protector solar. Todo suma y todo se comparte."
+                            },
+                            {
+                                "id": "listEmoji",
+                                "type": "emoji",
+                                "content": "🧺"
+                            }
+                        ],
+                        "layout": {
+                            "poolFrame": {
+                                "top": "12px",
+                                "left": "calc(50% - 44px)",
+                                "width": "88px",
+                                "opacity": 0.96,
+                                "zIndex": 1
+                            },
+                            "itemsTitle": {
+                                "top": "118px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "22px",
+                                "fontWeight": 700,
+                                "color": "#8a3b9a",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "itemsBody": {
+                                "top": "156px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "14px",
+                                "color": "#4b2b4d",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "listEmoji": {
+                                "top": "56px",
+                                "left": "18px",
+                                "fontSize": "26px",
+                                "opacity": 0
+                            }
+                        },
+                        "actions": {
+                            "poolFrame": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.6,
+                                            "y": -8,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.7,
+                                            "ease": "back.out(1.1)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "rotate": -4
+                                        },
+                                        "duration": 3.2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "itemsTitle": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": -12,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.55,
+                                            "delay": 0.12,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "itemsBody": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.55,
+                                            "delay": 0.28,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "listEmoji": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "x": -8,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "x": 0,
+                                            "opacity": 1,
+                                            "duration": 0.45,
+                                            "delay": 0.4,
+                                            "ease": "back.out(1.1)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "y": -5
+                                        },
+                                        "duration": 1.5,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.3
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "screen_5",
+                        "name": "Prize",
+                        "title": "Sorteo, Cesar Leon",
+                        "text": "Participá y podés ganar una Nintendo Wii — un empujoncito de suerte en la pileta podría ser todo lo que necesitas.",
+                        "actors": [
+                            {
+                                "id": "prizeIcon",
+                                "type": "image",
+                                "assetId": "img_10"
+                            },
+                            {
+                                "id": "prizeTitle",
+                                "type": "text",
+                                "content": "Sorteo, Cesar Leon"
+                            },
+                            {
+                                "id": "prizeBody",
+                                "type": "text",
+                                "content": "Participá y podés ganar una Nintendo Wii — un empujoncito de suerte en la pileta podría ser todo lo que necesitas."
+                            },
+                            {
+                                "id": "starEmoji",
+                                "type": "emoji",
+                                "content": "⭐"
+                            }
+                        ],
+                        "layout": {
+                            "prizeIcon": {
+                                "top": "20px",
+                                "left": "calc(50% - 44px)",
+                                "width": "88px",
+                                "opacity": 0.98,
+                                "zIndex": 1
+                            },
+                            "prizeTitle": {
+                                "top": "130px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "22px",
+                                "fontWeight": 800,
+                                "color": "#b2561f",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "prizeBody": {
+                                "top": "168px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "15px",
+                                "color": "#5a351f",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "starEmoji": {
+                                "top": "56px",
+                                "left": "18px",
+                                "fontSize": "28px",
+                                "opacity": 0
+                            }
+                        },
+                        "actions": {
+                            "prizeIcon": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.5,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "opacity": 1,
+                                            "duration": 0.8,
+                                            "ease": "elastic.out(1,0.6)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "rotate": 8
+                                        },
+                                        "duration": 2.2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "scale": 0.6,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "prizeTitle": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": -14,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.15,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -12,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "prizeBody": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": 12,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.3,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "starEmoji": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.3,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "opacity": 1,
+                                            "duration": 0.5,
+                                            "delay": 0.45,
+                                            "ease": "back.out(1.2)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "rotate": 20
+                                        },
+                                        "duration": 2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.3
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "screen_6",
+                        "name": "Closing",
+                        "title": "Nos vemos, Cesar Leon",
+                        "text": "Luna Leon y todos te esperamos el 10/01 a las 13:00. Traé tu buena onda — ¡nos vemos en la pileta! Confirmá si podés venir.",
+                        "actors": [
+                            {
+                                "id": "closingIcon",
+                                "type": "image",
+                                "assetId": "img_5"
+                            },
+                            {
+                                "id": "closingTitle",
+                                "type": "text",
+                                "content": "Nos vemos, Cesar Leon"
+                            },
+                            {
+                                "id": "closingBody",
+                                "type": "text",
+                                "content": "Luna Leon y todos te esperamos el 10/01 a las 13:00. Traé tu buena onda — ¡nos vemos en la pileta! Confirmá si podés venir."
+                            },
+                            {
+                                "id": "heartEmoji",
+                                "type": "emoji",
+                                "content": "❤️"
+                            }
+                        ],
+                        "layout": {
+                            "closingIcon": {
+                                "top": "14px",
+                                "left": "calc(50% - 46px)",
+                                "width": "92px",
+                                "opacity": 0.98,
+                                "zIndex": 1
+                            },
+                            "closingTitle": {
+                                "top": "128px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "24px",
+                                "fontWeight": 800,
+                                "color": "#1b5b73",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "closingBody": {
+                                "top": "168px",
+                                "left": "36px",
+                                "width": "calc(100% - 72px)",
+                                "fontSize": "15px",
+                                "color": "#2b4f5f",
+                                "opacity": 0,
+                                "zIndex": 2
+                            },
+                            "heartEmoji": {
+                                "top": "56px",
+                                "left": "18px",
+                                "fontSize": "28px",
+                                "opacity": 0
+                            }
+                        },
+                        "actions": {
+                            "closingIcon": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.7,
+                                            "y": -6,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.7,
+                                            "ease": "back.out(1.1)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "y": -6
+                                        },
+                                        "duration": 2.2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.4
+                                    }
+                                ]
+                            },
+                            "closingTitle": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": -12,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.12,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": -10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "closingBody": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "y": 0,
+                                            "opacity": 1,
+                                            "duration": 0.6,
+                                            "delay": 0.28,
+                                            "ease": "power2.out"
+                                        }
+                                    }
+                                ],
+                                "idle": [],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "y": 10,
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.35
+                                    }
+                                ]
+                            },
+                            "heartEmoji": {
+                                "entrance": [
+                                    {
+                                        "from": {
+                                            "scale": 0.4,
+                                            "opacity": 0
+                                        },
+                                        "to": {
+                                            "scale": 1,
+                                            "opacity": 1,
+                                            "duration": 0.5,
+                                            "delay": 0.42,
+                                            "ease": "elastic.out(1,0.6)"
+                                        }
+                                    }
+                                ],
+                                "idle": [
+                                    {
+                                        "to": {
+                                            "scale": 1.06
+                                        },
+                                        "duration": 1.2,
+                                        "yoyo": true,
+                                        "repeat": -1,
+                                        "ease": "sine.inOut"
+                                    }
+                                ],
+                                "exit": [
+                                    {
+                                        "to": {
+                                            "opacity": 0
+                                        },
+                                        "duration": 0.3
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "assets": {
+                    "img_0": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthoB2Hy-file.jpeg?f=png",
+                    "img_1": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZkeBB-file.svg?f=png",
+                    "img_2": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZer3M-file.svg?f=png",
+                    "img_3": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZU2Fc-file.svg?f=png",
+                    "img_4": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZNYE7-file.svg?f=png",
+                    "img_5": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZFZ4Y-file.svg?f=png",
+                    "img_6": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZ5B6P-file.svg?f=png",
+                    "img_7": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYtn7k-file.svg?f=png",
+                    "img_8": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYor4z-file.svg?f=png",
+                    "img_9": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYdz5H-file.svg?f=png",
+                    "img_10": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYTUdc-file.svg?f=png"
+                }
+            }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "assets": {
+            "img_0": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthoB2Hy-file.jpeg?f=png",
+            "img_1": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZkeBB-file.svg?f=png",
+            "img_2": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZer3M-file.svg?f=png",
+            "img_3": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZU2Fc-file.svg?f=png",
+            "img_4": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZNYE7-file.svg?f=png",
+            "img_5": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZFZ4Y-file.svg?f=png",
+            "img_6": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthZ5B6P-file.svg?f=png",
+            "img_7": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYtn7k-file.svg?f=png",
+            "img_8": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYor4z-file.svg?f=png",
+            "img_9": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYdz5H-file.svg?f=png",
+            "img_10": "https://upcdn.io/223k2XC/image/uploads/2026/01/02/4jFthYTUdc-file.svg?f=png"
+        }
+    }
+}
