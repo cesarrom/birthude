@@ -1,11 +1,8 @@
 {
   "home": {
-    "title": "Para comenzar, edita el archivo page.tsx.",
-    "description": "¿Buscas un punto de partida o más instrucciones? Visita <templates>Plantillas</templates> o el centro de <learning>Aprendizaje</learning>.",
-    "templates": "Plantillas",
-    "learning": "Aprendizaje",
-    "deploy": "Desplegar Ahora",
-    "docs": "Documentación",
+    "title": "Birthude",
+    "subtitle": "Crea invitaciones digitales inolvidables con facilidad.",
+    "description": "Diseña, personaliza y comparte las invitaciones de tu evento en minutos. Incluye seguimiento de RSVP, integración de mapas y recursos impulsados por IA.",
     "create": "Crear Invitación"
   },
   "create": {

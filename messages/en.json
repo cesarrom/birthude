@@ -1,11 +1,8 @@
 {
   "home": {
-    "title": "To get started, edit the page.tsx file.",
-    "description": "Looking for a starting point or more instructions? Head over to <templates>Templates</templates> or the <learning>Learning</learning> center.",
-    "templates": "Templates",
-    "learning": "Learning",
-    "deploy": "Deploy Now",
-    "docs": "Documentation",
+    "title": "Birthude",
+    "subtitle": "Create unforgettable digital invitations with ease.",
+    "description": "Design, personalize, and share your event invitations in minutes. Features include RSVP tracking, map integration, and AI-powered assets.",
     "create": "Create Invitation"
   },
   "create": {
