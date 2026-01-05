@@ -1,11 +1,8 @@
 {
   "home": {
-    "title": "Para começar, modifique o arquivo page.tsx.",
-    "description": "Procura um ponto de partida ou mais instruções? Vá para <templates>Modelos</templates> ou para o <learning>centro de aprendizagem</learning>.",
-    "templates": "Modelos",
-    "learning": "Aprendizagem",
-    "deploy": "Implantar agora",
-    "docs": "Documentação",
+    "title": "Birthude",
+    "subtitle": "Crie convites digitais inesquecíveis com facilidade.",
+    "description": "Crie, personalize e compartilhe seus convites de eventos em minutos. Inclui rastreamento de RSVP, integração com mapas e recursos alimentados por IA.",
     "create": "Criar convite"
   },
   "create": {
@@ -27,6 +24,7 @@
     "regenerateCount": "Regenerar ({count})",
     "customPrompt": "Prompt personalizado (opcional)",
     "generateWithPrompt": "Gerar",
+    "delete": "Excluir",
     "selectAll": "Selecionar tudo",
     "useSelected": "Usar seleção",
     "loading": "Carregando...",
@@ -42,6 +40,9 @@
     "imageUrl": "Imagem (URL)",
     "organizer": "Organizador",
     "ready": "Pronto",
+    "inviteeContext": "Contexto (ex. adora jazz, odeia aranhas)",
+    "confirmAssistance": "Confirmar Presença",
+    "assistanceConfirmed": "Presença Confirmada ✅",
     "createAction": "Criar convite",
     "thinking": "Pensando...",
     "selected": "Selecionado"

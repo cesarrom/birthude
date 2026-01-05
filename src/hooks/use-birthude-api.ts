@@ -232,6 +232,13 @@ export function useRevealInvitee(slug: string) {
     });
 }
 
+export function useConfirmAssistance(slug: string, identifier: string) {
+    return useMutation({
+        mutationFn: () => 
+            fetcher(`/api/invitations/${slug}/invitees/${identifier}/confirm`, { method: "POST" })
+    });
+}
+
 // --- Trivia Hooks ---
 
 export function useTriviaState(slug: string, enabled: boolean = true) {

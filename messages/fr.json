@@ -1,11 +1,8 @@
 {
   "home": {
-    "title": "Pour commencer, modifiez le fichier page.tsx.",
-    "description": "Vous cherchez un point de départ ou davantage d'instructions ? Rendez-vous sur <templates>Modèles</templates> ou au <learning>centre d'apprentissage</learning>.",
-    "templates": "Modèles",
-    "learning": "Apprentissage",
-    "deploy": "Déployer maintenant",
-    "docs": "Documentation",
+    "title": "Birthude",
+    "subtitle": "Créez des invitations numériques inoubliables en toute simplicité.",
+    "description": "Concevez, personnalisez et partagez vos invitations d'événements en quelques minutes. Inclut le suivi des RSVP, l'intégration de cartes et des ressources alimentées par l'IA.",
     "create": "Créer une invitation"
   },
   "create": {
@@ -27,6 +24,7 @@
     "regenerateCount": "Régénérer ({count})",
     "customPrompt": "Prompt personnalisé (optionnel)",
     "generateWithPrompt": "Générer",
+    "delete": "Supprimer",
     "selectAll": "Tout sélectionner",
     "useSelected": "Utiliser la sélection",
     "loading": "Chargement...",
@@ -42,6 +40,9 @@
     "imageUrl": "Image (URL)",
     "organizer": "Organisateur",
     "ready": "Prêt",
+    "inviteeContext": "Contexte (ex. aime le jazz, déteste les araignées)",
+    "confirmAssistance": "Confirmer la présence",
+    "assistanceConfirmed": "Présence confirmée ✅",
     "createAction": "Créer l'invitation",
     "thinking": "Réflexion...",
     "selected": "Sélectionné"

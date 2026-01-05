@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Schema Engine - Party Demo</title>
+    <!-- GSAP Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;600&family=Righteous&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body { margin: 0; padding: 0; overflow: hidden; background: #0f172a; font-family: 'Fredoka', sans-serif; }
+        
+        /* The Mount Point */
+        #app-stage {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1e293b 0%, #000000 100%);
+            overflow: hidden;
+        }
+
+        /* --- ENGINE INTERNAL STYLES --- */
+        .schema-asset {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; /* Default: click-through */
+            will-change: transform, opacity;
+        }
+
+        /* Slots need pointer events */
+        .schema-asset.type-slot { pointer-events: auto; }
+
+        /* SVG Styles for "Draw" animation */
+        .draw-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* --- UI OVERLAY (Next Button) --- */
+        #ui-layer {
+            position: absolute; bottom: 40px; width: 100%;
+            display: flex; justify-content: center; pointer-events: none; z-index: 100;
+        }
+        .nav-btn {
+            pointer-events: auto;
+            background: #ffffff; color: #0f172a;
+            border: none; padding: 15px 40px; border-radius: 50px;
+            font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translateY(100px); opacity: 0;
+            transition: transform 0.1s active;
+        }
+        .nav-btn:active { transform: scale(0.95); }
+
+        /* --- SLOT STYLES (External Component Styles) --- */
+        /* Map Card */
+        .map-card {
+            width: 100%; height: 100%; background: white; border-radius: 20px;
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .map-header { padding: 15px; background: #3b82f6; color: white; font-weight: bold; }
+        .map-view { flex: 1; background: #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
+        .map-pin { font-size: 3rem; animation: bounce 1s infinite; }
+        
+        /* RSVP Form */
+        .rsvp-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem; border-radius: 1rem; text-align: center;
+            width: 300px; box-shadow: 0 0 30px rgba(244, 63, 94, 0.3);
+        }
+        .rsvp-input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd;
+            border-radius: 8px; font-family: inherit; font-size: 1rem;
+        }
+        .rsvp-submit {
+            width: 100%; padding: 12px; background: #f43f5e; color: white;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
+            font-size: 1rem;
+        }
+
+        @keyframes bounce { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+    </style>
+</head>
+<body>
+
+    <div id="app-stage"></div>
+    <div id="ui-layer"></div>
+
+    <script>
+        /**
+         * ============================================================================
+         * 1. THE UNIVERSAL SCHEMA ENGINE
+         * ============================================================================
+         */
+        class UniversalSchemaEngine {
+            constructor(config) {
+                this.container = config.container;
+                this.manifest = config.manifest;
+                this.slots = config.slots || {};
+                this.domMap = new Map();
+                this.ambienceTweens = [];
+                this.currentStepIndex = -1;
+                
+                this.uiLayer = document.getElementById('ui-layer');
+                this.nextBtn = null;
+            }
+
+            async init() {
+                console.log("⚙️ Engine: Initializing Assets...");
+                await this.buildAssets();
+                console.log("✅ Engine: Assets Built.");
+                this.createUI();
+                this.next();
+            }
+
+            createUI() {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.innerText = "Continue";
+                btn.onclick = () => {
+                    this.hideButton();
+                    this.next();
+                };
+                this.uiLayer.appendChild(btn);
+                this.nextBtn = btn;
+            }
+
+            showButton(label) {
+                this.nextBtn.innerText = label;
+                gsap.to(this.nextBtn, { y: 0, opacity: 1, duration: 0.5, ease: "back.out" });
+            }
+
+            hideButton() {
+                gsap.to(this.nextBtn, { y: 100, opacity: 0, duration: 0.3 });
+            }
+
+            /** CORE: Asset Builder */
+            async buildAssets() {
+                const buildPromises = this.manifest.assets.map(async (asset) => {
+                    // Handle Particle/Clone Systems
+                    if (asset.cloneCount && asset.cloneCount > 0) {
+                        const clones = [];
+                        for(let i=0; i<asset.cloneCount; i++) {
+                            const el = await this.createSingleAsset(asset);
+                            // Randomize generic particle positions
+                            if (asset.id.includes('confetti') || asset.id.includes('particle')) {
+                                el.style.left = Math.random() * 100 + "%";
+                                el.style.top = "-50px"; // Start off screen
+                            }
+                            this.container.appendChild(el);
+                            clones.push(el);
+                        }
+                        this.domMap.set(asset.id, clones);
+                    } else {
+                        const el = await this.createSingleAsset(asset);
+                        this.container.appendChild(el);
+                        this.domMap.set(asset.id, el);
+                    }
+                });
+                await Promise.all(buildPromises);
+            }
+
+            async createSingleAsset(asset) {
+                const el = document.createElement('div');
+                el.id = asset.id;
+                el.className = `schema-asset type-${asset.type}`;
+                
+                // Base CSS
+                if (asset.css) Object.assign(el.style, asset.css);
+                gsap.set(el, { autoAlpha: 0 }); // Hide by default
+
+                // Type Logic
+                if (asset.type === 'text') {
+                    el.innerHTML = asset.content;
+                    el.style.textAlign = 'center';
+                } 
+                else if (asset.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = asset.src;
+                    img.style.width = "100%"; img.style.height = "100%"; img.style.objectFit = "contain";
+                    el.appendChild(img);
+                } 
+                else if (asset.type === 'svg') {
+                    // Support inline content OR fetching URL
+                    let svgContent = asset.content;
+                    if (!svgContent && asset.src) {
+                        // Check if it's a real URL we should fetch, or just an image ref
+                        if (asset.src.endsWith('.svg')) {
+                            try {
+                                const res = await fetch(asset.src);
+                                svgContent = await res.text();
+                            } catch(e) { console.warn("SVG Fetch Failed", e); }
+                        } else {
+                            // Fallback to image tag
+                            const img = document.createElement('img');
+                            img.src = asset.src;
+                            el.appendChild(img);
+                            return el;
+                        }
+                    }
+                    if (svgContent) {
+                        el.innerHTML = svgContent;
+                        const svg = el.querySelector('svg');
+                        if (svg) { 
+                            svg.style.width="100%"; svg.style.height="100%"; svg.style.overflow="visible";
+                        }
+                    }
+                } 
+                else if (asset.type === 'slot') {
+                    if (this.slots[asset.slotId]) {
+                        // INJECT ENGINE REFERENCE for manual control
+                        this.slots[asset.slotId](el, this); 
+                    } else {
+                        el.innerHTML = "❌ Missing Slot";
+                    }
+                }
+                return el;
+            }
+
+            /** CORE: Step Logic */
+            next() {
+                this.currentStepIndex++;
+                if (this.currentStepIndex >= this.manifest.timeline.length) {
+                    console.log("🏁 Sequence Complete");
+                    return;
+                }
+                this.playStep(this.manifest.timeline[this.currentStepIndex]);
+            }
+
+            playStep(step) {
+                console.log(`▶ Playing Step: ${step.id}`);
+
+                // 1. Cleanup Ambience from previous steps (Optional policy)
+                // For this demo, we kill previous ambience to prevent chaos
+                this.ambienceTweens.forEach(t => t.kill());
+                this.ambienceTweens = [];
+
+                // 2. Main Timeline
+                const tl = gsap.timeline({
+                    onComplete: () => this.handleCompletion(step)
+                });
+
+                if (step.cleanup) step.cleanup.forEach(act => this.runAction(act, tl));
+                step.animationFlow.forEach(act => this.runAction(act, tl));
+
+                // 3. Ambience (Parallel Loops)
+                if (step.ambience) {
+                    step.ambience.forEach(act => {
+                        const targets = this.resolveTarget(act.targetId);
+                        if(targets) {
+                            // Ambience runs outside the main TL
+                            const t = gsap.to(targets, act.vars);
+                            this.ambienceTweens.push(t);
+                        }
+                    });
+                }
+            }
+
+            runAction(act, tl) {
+                const targets = this.resolveTarget(act.targetId);
+                if (!targets) return;
+                const pos = act.position || ">";
+
+                if (act.type === 'draw') {
+                    // Complex SVG Draw
+                    const els = Array.isArray(targets) ? targets : [targets];
+                    els.forEach(wrapper => {
+                        const paths = wrapper.querySelectorAll('path, circle, rect, line');
+                        paths.forEach(p => {
+                            const len = p.getTotalLength();
+                            p.style.strokeDasharray = len;
+                            p.style.strokeDashoffset = len;
+                            tl.to(p, { strokeDashoffset: 0, ...act.vars }, pos);
+                        });
+                    });
+                } else if (act.type === 'to') {
+                    tl.to(targets, act.vars, pos);
+                } else if (act.type === 'fromTo') {
+                    tl.fromTo(targets, act.fromVars, act.vars, pos);
+                } else if (act.type === 'set') {
+                    tl.set(targets, act.vars, pos);
+                }
+            }
+
+            resolveTarget(id) {
+                if (id.startsWith('#')) return this.container.querySelector(id);
+                return this.domMap.get(id);
+            }
+
+            handleCompletion(step) {
+                const c = step.completion;
+                if (c.trigger === 'auto') {
+                    gsap.delayedCall(c.delay || 0, () => this.next());
+                } else if (c.trigger === 'interaction') {
+                    this.showButton(c.label || "Next");
+                } 
+                // 'manual' does nothing. It waits for engine.next() call from slot.
+            }
+        }
+
+
+        /**
+         * ============================================================================
+         * 2. THE MANIFEST (6 Screens)
+         * ============================================================================
+         */
+        const SVG_RAINBOW = `<svg viewBox="0 0 200 100"><path d="M10,100 A90,90 0 0,1 190,100" stroke="#f43f5e" stroke-width="8" fill="none" class="draw-path"/><path d="M30,100 A70,70 0 0,1 170,100" stroke="#fbbf24" stroke-width="8" fill="none" class="draw-path"/><path d="M50,100 A50,50 0 0,1 150,100" stroke="#34d399" stroke-width="8" fill="none" class="draw-path"/><path d="M70,100 A30,30 0 0,1 130,100" stroke="#38bdf8" stroke-width="8" fill="none" class="draw-path"/></svg>`;
+        
+        const SVG_WATER = `<svg viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0,50 C200,80 300,20 500,50 C700,80 800,20 1000,50 L1000,100 L0,100 Z" fill="#0ea5e9" opacity="0.6"/></svg>`;
+
+        const partyManifest = {
+            assets: [
+                // --- S1: Intro ---
+                { id: "rainbow", type: "svg", content: SVG_RAINBOW, css: { width: "300px", top: "15%", left: "50%", marginLeft: "-150px" } },
+                { id: "txt_invite", type: "text", content: "YOU ARE<br>INVITED", css: { fontSize: "5rem", color: "#fff", top: "45%", fontFamily: "Righteous" } },
+                
+                // --- S2: When ---
+                { id: "cal_icon", type: "image", src: "https://api.dicebear.com/7.x/shapes/svg?seed=cal&backgroundColor=f43f5e", css: { width: "120px", top: "20%", left: "50%", marginLeft: "-60px" } },
+                { id: "txt_date", type: "text", content: "AUGUST 24<br><span style='font-size:3rem'>8:00 PM</span>", css: { fontSize: "5rem", color: "#fff", top: "45%" } },
+                { id: "water_bg", type: "svg", content: SVG_WATER, css: { width: "200%", height: "200px", bottom: "-50px", left: "0" } },
+
+                // --- S3: Where (Slot) ---
+                { id: "txt_loc", type: "text", content: "LOCATION", css: { fontSize: "3rem", color: "#38bdf8", top: "15%" } },
+                { id: "map_slot", type: "slot", slotId: "MapComponent", css: { width: "300px", height: "300px", top: "50%", left: "50%", transform: "translate(-50%, -50%)" } },
+
+                // --- S4: Bring ---
+                { id: "txt_bring", type: "text", content: "BRING YOUR", css: { fontSize: "3rem", color: "#fff", top: "20%" } },
+                { id: "icon_vibes", type: "text", content: "😎", css: { fontSize: "6rem", top: "50%", left: "50%", marginLeft:"-3rem" } },
+                { id: "icon_swim", type: "text", content: "🩳", css: { fontSize: "6rem", top: "50%", left: "20%" } },
+                { id: "icon_drink", type: "text", content: "🍹", css: { fontSize: "6rem", top: "50%", right: "20%" } },
+
+                // --- S5: Raffle (Particles) ---
+                { id: "txt_win", type: "text", content: "WIN BIG!", css: { fontSize: "6rem", color: "#fbbf24", top: "40%", fontFamily: "Righteous" } },
+                { id: "confetti", type: "text", content: "★", cloneCount: 40, css: { color: "#fbbf24", fontSize: "20px" } },
+
+                // --- S6: RSVP (Manual) ---
+                { id: "rsvp_slot", type: "slot", slotId: "RSVPForm", css: { top: "50%", left: "50%", transform: "translate(-50%, -50%)" } },
+                { id: "txt_final", type: "text", content: "SEE YOU THERE!", css: { fontSize: "4rem", color: "#fff", top: "40%" } }
+            ],
+            timeline: [
+                // STEP 1: INTRO (Draws rainbow, Auto Next)
+                {
+                    id: "step1_intro",
+                    animationFlow: [
+                        { targetId: "rainbow", type: "set", vars: { autoAlpha: 1 } },
+                        { targetId: "rainbow", type: "draw", vars: { duration: 1.5, ease: "power2.inOut" } },
+                        { targetId: "txt_invite", type: "fromTo", fromVars: { y: 50, autoAlpha: 0 }, vars: { y: 0, autoAlpha: 1, duration: 1 }, position: "-=1" }
+                    ],
+                    completion: { trigger: "auto", delay: 2 }
+                },
+                // STEP 2: WHEN (Water flows, Interaction Next)
+                {
+                    id: "step2_when",
+                    cleanup: [ { targetId: "rainbow", type: "to", vars: { autoAlpha: 0 } }, { targetId: "txt_invite", type: "to", vars: { autoAlpha: 0, scale: 2 } } ],
+                    animationFlow: [
+                        { targetId: "water_bg", type: "fromTo", fromVars: { y: 100, autoAlpha: 0 }, vars: { y: 0, autoAlpha: 1, duration: 1 } },
+                        { targetId: "cal_icon", type: "fromTo", fromVars: { scale: 0, autoAlpha: 0 }, vars: { scale: 1, autoAlpha: 1, duration: 0.5, ease: "back.out" } },
+                        { targetId: "txt_date", type: "fromTo", fromVars: { autoAlpha: 0 }, vars: { autoAlpha: 1, duration: 0.5 }, position: "+=0.2" }
+                    ],
+                    ambience: [
+                        { targetId: "water_bg", type: "to", vars: { x: "-50%", duration: 5, ease: "linear", repeat: -1 } }
+                    ],
+                    completion: { trigger: "interaction", label: "Where?" }
+                },
+                // STEP 3: WHERE (Slot Scales In, Ambience continues)
+                {
+                    id: "step3_where",
+                    cleanup: [ { targetId: "cal_icon", type: "to", vars: { autoAlpha: 0 } }, { targetId: "txt_date", type: "to", vars: { autoAlpha: 0 } } ],
+                    animationFlow: [
+                        { targetId: "txt_loc", type: "fromTo", fromVars: { autoAlpha: 0, y: -50 }, vars: { autoAlpha: 1, y: 0, duration: 0.5 } },
+                        { targetId: "map_slot", type: "fromTo", fromVars: { scale: 0, autoAlpha: 0, rotation: 10 }, vars: { scale: 1, autoAlpha: 1, rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.5)" } }
+                    ],
+                    ambience: [
+                        // Keep water flowing? No, we killed it automatically in engine.
+                        // Let's float the map
+                        { targetId: "map_slot", type: "to", vars: { y: "-=20", duration: 2, yoyo: true, repeat: -1, ease: "sine.inOut" } }
+                    ],
+                    completion: { trigger: "interaction", label: "Details" }
+                },
+                // STEP 4: BRING (Icons Pop)
+                {
+                    id: "step4_bring",
+                    cleanup: [ { targetId: "txt_loc", type: "to", vars: { autoAlpha: 0 } }, { targetId: "map_slot", type: "to", vars: { autoAlpha: 0, y: 500 } } ],
+                    animationFlow: [
+                        { targetId: "txt_bring", type: "fromTo", fromVars: { autoAlpha: 0 }, vars: { autoAlpha: 1, duration: 0.5 } },
+                        { targetId: "icon_vibes", type: "fromTo", fromVars: { scale: 0, autoAlpha: 0 }, vars: { scale: 1, autoAlpha: 1, duration: 0.5, ease: "back.out" } },
+                        { targetId: "icon_swim", type: "fromTo", fromVars: { scale: 0, autoAlpha: 0 }, vars: { scale: 1, autoAlpha: 1, duration: 0.5, ease: "back.out" }, position: "-=0.3" },
+                        { targetId: "icon_drink", type: "fromTo", fromVars: { scale: 0, autoAlpha: 0 }, vars: { scale: 1, autoAlpha: 1, duration: 0.5, ease: "back.out" }, position: "-=0.3" }
+                    ],
+                    completion: { trigger: "interaction", label: "Prizes!" }
+                },
+                // STEP 5: RAFFLE (Particles Explode)
+                {
+                    id: "step5_raffle",
+                    cleanup: [ { targetId: "txt_bring", type: "to", vars: { autoAlpha: 0 } }, { targetId: "icon_vibes", type: "to", vars: { scale: 0 } }, { targetId: "icon_swim", type: "to", vars: { scale: 0 } }, { targetId: "icon_drink", type: "to", vars: { scale: 0 } } ],
+                    animationFlow: [
+                        { targetId: "txt_win", type: "fromTo", fromVars: { scale: 0, autoAlpha: 0 }, vars: { scale: 1, autoAlpha: 1, duration: 0.5, ease: "back.out" } },
+                        { 
+                            targetId: "confetti", type: "to", 
+                            vars: { 
+                                autoAlpha: 1, 
+                                y: "110vh", 
+                                x: "random(-200, 200)", 
+                                rotation: "random(0, 720)", 
+                                duration: "random(2, 4)", 
+                                ease: "power1.out", 
+                                stagger: { amount: 1, from: "random" } 
+                            } 
+                        }
+                    ],
+                    completion: { trigger: "interaction", label: "RSVP" }
+                },
+                // STEP 6: RSVP (Manual Form)
+                {
+                    id: "step6_rsvp",
+                    cleanup: [ { targetId: "txt_win", type: "to", vars: { autoAlpha: 0 } }, { targetId: "confetti", type: "to", vars: { autoAlpha: 0 } } ],
+                    animationFlow: [
+                        { targetId: "rsvp_slot", type: "fromTo", fromVars: { y: 100, autoAlpha: 0 }, vars: { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" } }
+                    ],
+                    completion: { trigger: "manual" } // ENGINE STOPS HERE. Waits for slot.
+                },
+                // STEP 7: FINAL
+                {
+                    id: "step7_end",
+                    cleanup: [ { targetId: "rsvp_slot", type: "to", vars: { scale: 0, autoAlpha: 0 } } ],
+                    animationFlow: [
+                        { targetId: "txt_final", type: "fromTo", fromVars: { scale: 1.5, autoAlpha: 0 }, vars: { scale: 1, autoAlpha: 1, duration: 1, ease: "elastic.out" } }
+                    ],
+                    completion: { trigger: "auto", delay: 999 } // End
+                }
+            ]
+        };
+
+        /**
+         * ============================================================================
+         * 3. SLOT REGISTRY (External Components)
+         * ============================================================================
+         */
+        const componentRegistry = {
+            "MapComponent": (container) => {
+                container.innerHTML = `
+                    <div class="map-card">
+                        <div class="map-header">📍 123 Party Ave, NY</div>
+                        <div class="map-view">
+                            <div class="map-pin">📍</div>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            // This slot controls the engine!
+            "RSVPForm": (container, engine) => {
+                container.innerHTML = `
+                    <div class="rsvp-card">
+                        <h2 style="color:#f43f5e; margin-bottom:5px;">Are you coming?</h2>
+                        <input class="rsvp-input" type="text" placeholder="Your Name" />
+                        <button class="rsvp-submit">CONFIRM ATTENDANCE</button>
+                    </div>
+                `;
+                
+                const btn = container.querySelector('.rsvp-submit');
+                const input = container.querySelector('.rsvp-input');
+                
+                btn.onclick = () => {
+                    if(input.value.trim() === "") {
+                        alert("Please enter your name!");
+                        return;
+                    }
+                    btn.innerText = "Sending...";
+                    
+                    // Simulate API Call
+                    setTimeout(() => {
+                        // PROGRAMMATIC NAVIGATION
+                        console.log("✅ Form Submitted. Calling engine.next()");
+                        engine.next(); 
+                    }, 1000);
+                };
+            }
+        };
+
+        /**
+         * ============================================================================
+         * 4. BOOTSTRAP
+         * ============================================================================
+         */
+        window.onload = () => {
+            const engine = new UniversalSchemaEngine({
+                container: document.getElementById('app-stage'),
+                manifest: partyManifest,
+                slots: componentRegistry
+            });
+
+            engine.init();
+        };
+
+    </script>
+</body>
+</html>

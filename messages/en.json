@@ -40,6 +40,9 @@
     "imageUrl": "Image (URL)",
     "organizer": "Organizer",
     "ready": "Ready",
+    "inviteeContext": "Context (e.g. loves jazz, hates spiders)",
+    "confirmAssistance": "Confirm Assistance",
+    "assistanceConfirmed": "Assistance Confirmed ✅",
     "createAction": "Create Invitation",
     "thinking": "Thinking...",
     "selected": "Selected"

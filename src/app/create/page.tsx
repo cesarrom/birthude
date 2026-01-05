@@ -417,7 +417,7 @@ function AssetsAISelect({ context, onSubmit, loading }: { context: any; onSubmit
     </div>
   );
 }
-const MapCanvas = dynamic(() => import("@/app/create/map-canvas"), { ssr: false });
+const MapCanvas = dynamic(() => import("@/components/map-canvas"), { ssr: false });
 
 function LocationPicker({ onSubmit }: { onSubmit: (loc: { address: string; lat: number; lng: number }) => void }) {
   const t = useTranslations('create');
@@ -513,32 +513,14 @@ function RaffleInput({ onSubmit }: { onSubmit: (prize: string | null) => void })
     </div>
   );
 }
-function PeopleBuilder({ people, onAdd, onRemove, onDone }: { people: Array<{ identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean }>; onAdd: (p: { identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean }) => void; onRemove: (identifier: string) => void; onDone: () => void }) {
+import { InviteeForm } from "@/components/invitee-form";
+
+function PeopleBuilder({ people, onAdd, onRemove, onDone }: { people: Array<{ identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean; context?: string }>; onAdd: (p: { identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean; context?: string }) => void; onRemove: (identifier: string) => void; onDone: () => void }) {
   const t = useTranslations('create');
-  const [name, setName] = useState("");
-  const [identifier, setIdentifier] = useState("");
-  const [age, setAge] = useState<number | "">("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [isOrganizer, setIsOrganizer] = useState(false);
-  function add() {
-    const payload = { identifier: identifier.trim() || name.trim(), name: name.trim() || undefined, age: typeof age === "number" ? age : undefined, imageUrl: imageUrl.trim() || undefined, isOrganizer };
-    if (!payload.identifier) return;
-    onAdd(payload);
-    setName(""); setIdentifier(""); setAge(""); setImageUrl(""); setIsOrganizer(false);
-  }
+  
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <input className="rounded-xl border px-4 py-3" placeholder={t('name')} value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="rounded-xl border px-4 py-3" placeholder={t('identifier')} value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
-        <input className="rounded-xl border px-4 py-3" type="number" placeholder={t('age')} value={age as any} onChange={(e) => setAge(e.target.value ? Number(e.target.value) : "")} />
-        <input className="rounded-xl border px-4 py-3" placeholder={t('imageUrl')} value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-      </div>
-      <div className="flex items-center gap-2">
-        <label className="text-sm"><input type="checkbox" className="mr-2" checked={isOrganizer} onChange={(e) => setIsOrganizer(e.target.checked)} />{t('organizer')}</label>
-        <button className="ml-auto rounded-xl bg-purple-600 px-4 py-3 text-white" onClick={add}>{t('add')}</button>
-        <button className="rounded-xl bg-black px-4 py-3 text-white" onClick={onDone}>{t('ready')}</button>
-      </div>
+      <InviteeForm onAdd={onAdd} onDone={onDone} mode="builder" />
       <div className="mt-2 flex flex-wrap gap-2">
         {people?.map((p) => (
           <button key={p.identifier} className="rounded-full bg-purple-200 px-3 py-1 text-sm dark:bg-purple-700 hover:opacity-80" onClick={() => onRemove(p.identifier)}>{p.name ?? p.identifier}{p.isOrganizer ? ` • ${t('organizer')}` : ""}</button>

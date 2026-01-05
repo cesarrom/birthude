@@ -28,9 +28,11 @@ export const invitees = pgTable("invitees", {
   imageUrl: varchar("image_url", { length: 512 }),
   isOrganizer: boolean("is_organizer").default(false).notNull(),
   assignedItem: varchar("assigned_item", { length: 256 }),
+  context: text("context"),
   hasSeen: boolean("has_seen").default(false).notNull(),
   hasSeenRaffle: boolean("has_seen_raffle").default(false).notNull(),
   giveawayNumber: varchar("giveaway_number", { length: 32 }),
+  isConfirmed: boolean("is_confirmed").default(false).notNull(),
   experience: jsonb("experience").$type<any>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

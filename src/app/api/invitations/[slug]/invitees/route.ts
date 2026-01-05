@@ -27,6 +27,7 @@ const createInviteeSchema = z.object({
   age: z.number().optional(),
   imageUrl: z.string().url().optional(),
   isOrganizer: z.boolean().optional(),
+  context: z.string().optional(),
 });
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
       age: data.age,
       imageUrl: data.imageUrl,
       isOrganizer: !!data.isOrganizer,
+      context: data.context,
     }).returning();
     return NextResponse.json({ invitee: row }, { status: 201 });
   } catch {

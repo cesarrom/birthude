@@ -5,7 +5,7 @@ import { GsapScreen } from "./gsap-screen";
 import { CountdownTarget } from "./countdown-target";
 import { SlotMachinePro } from "./slot-machine-pro";
 
-const MapCanvas = dynamic(() => import("@/app/create/map-canvas"), { ssr: false });
+const MapCanvas = dynamic(() => import("@/components/map-canvas"), { ssr: false });
 
 function ProgressDots({ count, current, color = "#ffffff" }: { count: number; current: number; color?: string }) {
   return (
@@ -131,7 +131,7 @@ export function RewindExperience({ experience, invitation, assignedItem, step, o
           <button className="rounded-full px-4 py-2 backdrop-blur hover:opacity-80 transition-opacity" style={{ backgroundColor: btnBg, color: btnText }} onClick={onNext}>
             {step === screens.length - 1 ? "Finish" : "Next"}
           </button>
-          <button className="ml-2 rounded-full px-3 py-2 text-sm backdrop-blur hover:opacity-80 transition-opacity" style={{ backgroundColor: btnBg, color: btnText }} onClick={onToggleSound}>Sound</button>
+          {/* <button className="ml-2 rounded-full px-3 py-2 text-sm backdrop-blur hover:opacity-80 transition-opacity" style={{ backgroundColor: btnBg, color: btnText }} onClick={onToggleSound}>Sound</button> */}
         </div>
       </div>
     </div>

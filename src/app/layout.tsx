@@ -5,6 +5,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import "./globals.css";
 import LanguageSelector from "./language-selector";
 import QueryProvider from "@/providers/query-provider";
+import { DbHealthMonitor } from "@/components/db-health-monitor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default async function RootLayout({
           <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
             {children}
             <LanguageSelector />
+            <DbHealthMonitor />
           </body>
         </html>
       </QueryProvider>

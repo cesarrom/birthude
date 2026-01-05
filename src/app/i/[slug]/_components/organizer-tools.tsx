@@ -2,13 +2,10 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useInvitees, useAddInvitee, useDrawRaffleWinner, useStartTrivia } from "@/hooks/use-birthude-api";
+import { InviteeForm } from "@/components/invitee-form";
 
 export function OrganizerTools({ slug, items, rafflePrize, onStartTrivia, eventAt, raffleWinner }: { slug: string; items: string[]; rafflePrize?: string | null; onStartTrivia?: () => void; eventAt: string | Date; raffleWinner: string | null }) {
   const t = useTranslations("viewer");
-  const [name, setName] = useState("");
-  const [identifier, setIdentifier] = useState("");
-  const [age, setAge] = useState<number | "">("");
-  const [imageUrl, setImageUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [localWinner, setLocalWinner] = useState<string | null>(null);
   
@@ -63,13 +60,11 @@ export function OrganizerTools({ slug, items, rafflePrize, onStartTrivia, eventA
   
   const remaining = items.filter(i => !assignedCount[i]);
 
-  async function add() {
-    if (!identifier.trim()) return;
+  async function add(payload: { identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean; context?: string }) {
     setSaving(true);
-    console.log("[OrganizerTools] Adding invitee", identifier);
+    console.log("[OrganizerTools] Adding invitee", payload.identifier);
     try {
-        await addInvitee.mutateAsync({ identifier: identifier.trim(), name: name.trim() || undefined, age: typeof age === "number" ? age : undefined, imageUrl: imageUrl.trim() || undefined });
-        setName(""); setIdentifier(""); setAge(""); setImageUrl("");
+        await addInvitee.mutateAsync(payload);
     } catch (e) {
         console.error("[OrganizerTools] Add invitee failed", e);
     }
@@ -115,14 +110,8 @@ export function OrganizerTools({ slug, items, rafflePrize, onStartTrivia, eventA
             <button onClick={startTrivia} className="text-xs bg-indigo-600 text-white px-2 py-1 rounded">{t('startTrivia')}</button>
           )}
       </div>
-      <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-        <input className="rounded-xl border px-3 py-2" placeholder={t('name')} value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="rounded-xl border px-3 py-2" placeholder={t('identifier')} value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
-        <input className="rounded-xl border px-3 py-2" type="number" placeholder={t('age')} value={age as any} onChange={(e) => setAge(e.target.value ? Number(e.target.value) : "")} />
-        <input className="rounded-xl border px-3 py-2" placeholder={t('imageUrl')} value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-      </div>
-      <div className="mt-2 flex justify-end">
-        <button className="rounded-xl bg-black px-4 py-2 text-white" disabled={saving} onClick={add}>{saving ? t('saving') : t('invite')}</button>
+      <div className="mt-2">
+        <InviteeForm onAdd={add} loading={saving} mode="tool" />
       </div>
       
       {items.length > 0 && (
