@@ -329,12 +329,17 @@ function AssetsAISelect({ context, onSubmit, loading }: { context: any; onSubmit
       const svg = svgs[i];
       const base64 = btoa(unescape(encodeURIComponent(svg)));
       const dataUrl = `data:image/svg+xml;base64,${base64}`;
-      let fileUrl = dataUrl;
+      let fileUrl = null;
       try {
         const json = await upload.mutateAsync({ data: dataUrl, mimeType: "image/svg+xml", name: `ai-${Date.now()}-${i}.svg` });
         if (json.fileUrl) fileUrl = json.fileUrl;
       } catch {}
-      picks.push({ name: `ai-${i}.svg`, source: fileUrl, mimeType: "image/svg+xml" });
+      
+      if (fileUrl) {
+          picks.push({ name: `ai-${i}.svg`, source: fileUrl, mimeType: "image/svg+xml" });
+      } else {
+          console.error("Failed to upload AI asset", i);
+      }
     }
     setUploading(false);
     if (!picks.length) return;

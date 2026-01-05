@@ -194,18 +194,16 @@ export function useRevealInvitee(slug: string) {
     mutationFn: async (identifier: string) => {
       const idNorm = identifier.trim().toLowerCase();
       let exData;
+      const lang = new URLSearchParams(window.location.search).get("lang");
+      const query = lang ? `?lang=${lang}` : "";
 
       // 1. Try to fetch existing experience
       try {
-        exData = await fetcher(`/api/invitations/${slug}/invitees/${identifier.trim()}/experience`);
+        exData = await fetcher(`/api/invitations/${slug}/invitees/${identifier.trim()}/experience${query}`);
       } catch (e) {
         // If 404, we create
-        // Fetcher throws error on non-ok status. 
-        // We should check if it's 404 or something else, but fetcher swallows status code into generic error.
-        // We might need to adjust fetcher or just try create on any error for now (or improve fetcher)
-        // Let's assume error means not found for this flow as per previous logic
         try {
-          exData = await fetcher(`/api/invitations/${slug}/invitees/${identifier.trim()}/experience`, { method: "POST" });
+          exData = await fetcher(`/api/invitations/${slug}/invitees/${identifier.trim()}/experience${query}`, { method: "POST" });
         } catch (createErr) {
           throw createErr;
         }
@@ -216,12 +214,14 @@ export function useRevealInvitee(slug: string) {
       // 2. Fetch metadata (isOrganizer, hasSeen)
       let isOrganizer = false;
       let hasSeen = false;
+      let isConfirmed = false;
       try {
         const invData = await fetcher(`/api/invitations/${slug}/invitees`);
         const me = (invData.invitees || []).find((x: any) => x.identifier?.toLowerCase() === idNorm);
         if (me) {
           isOrganizer = !!me.isOrganizer;
           hasSeen = !!me.hasSeen;
+          isConfirmed = !!me.isConfirmed;
         }
       } catch { }
 
@@ -238,7 +238,8 @@ export function useRevealInvitee(slug: string) {
         isOrganizer,
         hasSeen,
         assignedItem,
-        identifier: identifier.trim()
+        identifier: identifier.trim(),
+        isConfirmed
       };
     }
   });
