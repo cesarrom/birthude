@@ -20,7 +20,7 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ slug: str
 
   let text = "";
   if (process.env.OPENROUTER_API_KEY) {
-    const result = await generateText({ model: openrouter("openrouter/auto"), prompt });
+    const result = await generateText({ model: openrouter("google/gemini-3-flash-preview"), prompt });
     text = result.text;
   }
 

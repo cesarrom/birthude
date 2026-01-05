@@ -43,8 +43,15 @@
     "inviteeContext": "Context (e.g. loves jazz, hates spiders)",
     "confirmAssistance": "Confirm Assistance",
     "assistanceConfirmed": "Assistance Confirmed ✅",
+    "openMaps": "Open in Maps",
+    "copyLink": "Copy Link",
+    "linkCopied": "Copied!",
+    "status": "Status",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
     "createAction": "Create Invitation",
     "thinking": "Thinking...",
+    "invite": "Invite",
     "selected": "Selected"
   },
   "viewer": {
@@ -108,7 +115,9 @@
     "shortDay": "d",
     "shortHour": "h",
     "shortMinute": "m",
-    "shortSecond": "s"
+    "shortSecond": "s",
+    "confirmAssistance": "Confirm Assistance",
+    "assistanceConfirmed": "Assistance Confirmed ✅"
   },
   "page": {
     "notFound": "Not found",

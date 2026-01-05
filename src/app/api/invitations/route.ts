@@ -18,6 +18,7 @@ const createInvitationSchema = z.object({
     name: z.string().optional(),
     age: z.number().optional(),
     imageUrl: z.string().url().optional(),
+    context: z.string().optional().default(""),
     isOrganizer: z.boolean().optional(),
   })).default([]),
   rafflePrize: z.string().optional().nullable(),
@@ -54,14 +55,14 @@ export async function POST(req: NextRequest) {
           title: data.title,
           theme: data.theme,
           description: data.description,
-        eventAt: new Date(data.eventAt),
-        location: data.location,
-        lat: data.lat,
-        lng: data.lng,
-        items: data.items,
-        rafflePrize: data.rafflePrize ?? null,
-        assets: data.assets,
-      })
+          eventAt: new Date(data.eventAt),
+          location: data.location,
+          lat: data.lat,
+          lng: data.lng,
+          items: data.items,
+          rafflePrize: data.rafflePrize ?? null,
+          assets: data.assets,
+        })
         .returning();
       const invId = inserted[0].id as string;
       if (data.invitees.length) {
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
             identifier: p.identifier,
             name: p.name,
             age: p.age,
+            context: p.context,
             imageUrl: p.imageUrl,
             isOrganizer: !!p.isOrganizer,
           }))

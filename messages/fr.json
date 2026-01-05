@@ -45,6 +45,7 @@
     "assistanceConfirmed": "Présence confirmée ✅",
     "createAction": "Créer l'invitation",
     "thinking": "Réflexion...",
+    "invite": "Inviter",
     "selected": "Sélectionné"
   },
   "viewer": {
@@ -108,7 +109,15 @@
     "shortDay": "j",
     "shortHour": "h",
     "shortMinute": "m",
-    "shortSecond": "s"
+    "shortSecond": "s",
+    "confirmAssistance": "Confirmer la Présence",
+    "assistanceConfirmed": "Présence Confirmée ✅",
+    "openMaps": "Ouvrir dans Maps",
+    "copyLink": "Copier le Lien",
+    "linkCopied": "Copié !",
+    "status": "Statut",
+    "confirmed": "Confirmé",
+    "pending": "En attente"
   },
   "page": {
     "notFound": "Non trouvé",

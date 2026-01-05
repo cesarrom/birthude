@@ -43,8 +43,15 @@
     "inviteeContext": "Contexto (ej. ama el jazz, odia las arañas)",
     "confirmAssistance": "Confirmar Asistencia",
     "assistanceConfirmed": "Asistencia Confirmada ✅",
+    "openMaps": "Abrir en Mapas",
+    "copyLink": "Copiar Link",
+    "linkCopied": "¡Copiado!",
+    "status": "Estado",
+    "confirmed": "Confirmado",
+    "pending": "Pendiente",
     "createAction": "Crear Invitación",
     "thinking": "Pensando...",
+    "invite": "Invitar",
     "selected": "Seleccionadas"
   },
   "viewer": {
@@ -108,7 +115,9 @@
     "shortDay": "d",
     "shortHour": "h",
     "shortMinute": "m",
-    "shortSecond": "s"
+    "shortSecond": "s",
+    "confirmAssistance": "Confirmar Asistencia",
+    "assistanceConfirmed": "Asistencia Confirmada ✅"
   },
   "page": {
     "notFound": "No encontrado",

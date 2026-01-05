@@ -43,8 +43,15 @@
     "inviteeContext": "Contexto (ex. adora jazz, odeia aranhas)",
     "confirmAssistance": "Confirmar Presença",
     "assistanceConfirmed": "Presença Confirmada ✅",
+    "openMaps": "Abrir no Maps",
+    "copyLink": "Copiar Link",
+    "linkCopied": "Copiado!",
+    "status": "Status",
+    "confirmed": "Confirmado",
+    "pending": "Pendente",
     "createAction": "Criar convite",
     "thinking": "Pensando...",
+    "invite": "Convidar",
     "selected": "Selecionado"
   },
   "viewer": {
@@ -108,7 +115,9 @@
     "shortDay": "d",
     "shortHour": "h",
     "shortMinute": "m",
-    "shortSecond": "s"
+    "shortSecond": "s",
+    "confirmAssistance": "Confirmar Presença",
+    "assistanceConfirmed": "Presença Confirmada ✅"
   },
   "page": {
     "notFound": "Não encontrado",

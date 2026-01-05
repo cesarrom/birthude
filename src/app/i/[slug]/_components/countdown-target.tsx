@@ -1,8 +1,19 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { CalendarButton } from "@/components/calendar-button";
 
-export function CountdownTarget({ eventAt, large }: { eventAt: string | Date; large?: boolean }) {
+type Props = {
+  eventAt: string | Date;
+  large?: boolean;
+  eventDetails?: {
+    title: string;
+    description?: string;
+    location: string;
+  };
+};
+
+export function CountdownTarget({ eventAt, large, eventDetails }: Props) {
   const t = useTranslations("viewer");
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
@@ -41,14 +52,6 @@ export function CountdownTarget({ eventAt, large }: { eventAt: string | Date; la
     return () => clearInterval(timer);
   }, [eventAt]);
 
-  if (!timeLeft) {
-    return (
-      <div className={`mt-3 opacity-90 ${large ? "text-2xl" : "text-sm"}`}>
-        {t('eventStarted')}
-      </div>
-    );
-  }
-
   // Helper to render a time unit block
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center mx-2">
@@ -58,11 +61,31 @@ export function CountdownTarget({ eventAt, large }: { eventAt: string | Date; la
   );
 
   return (
-    <div className={`mt-3 flex flex-wrap justify-center items-center ${large ? "gap-2" : "gap-1"}`}>
-      <TimeUnit value={timeLeft.days} label={t('days')} />
-      <TimeUnit value={timeLeft.hours} label={t('hours')} />
-      <TimeUnit value={timeLeft.minutes} label={t('minutes')} />
-      <TimeUnit value={timeLeft.seconds} label={t('seconds')} />
+    <div className="flex flex-col items-center">
+      {timeLeft ? (
+        <div className={`mt-3 flex flex-wrap justify-center items-center ${large ? "gap-2" : "gap-1"}`}>
+          <TimeUnit value={timeLeft.days} label={t('days')} />
+          <TimeUnit value={timeLeft.hours} label={t('hours')} />
+          <TimeUnit value={timeLeft.minutes} label={t('minutes')} />
+          <TimeUnit value={timeLeft.seconds} label={t('seconds')} />
+        </div>
+      ) : (
+        <div className={`mt-3 opacity-90 ${large ? "text-2xl" : "text-sm"}`}>
+          {t('eventStarted')}
+        </div>
+      )}
+
+      {eventDetails && (
+        <CalendarButton 
+            event={{
+                title: eventDetails.title,
+                description: eventDetails.description,
+                location: eventDetails.location,
+                start: eventAt
+            }} 
+            className="mt-4 text-sm underline opacity-80 hover:opacity-100"
+        />
+      )}
     </div>
   );
 }

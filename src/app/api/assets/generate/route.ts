@@ -16,7 +16,8 @@ function svgPromptForIdea(idea: string, context: any) {
 Constraints:
 - Return ONLY the SVG markup string.
 - width=128 height=128 viewBox="0 0 128 128".
-- no external references.
+- no external references. no background color or background element.
+- no text or labels.
 Context: ${JSON.stringify(context)}`;
 }
 
@@ -59,13 +60,13 @@ export async function POST(req: NextRequest) {
         }
         const meta: any = { aiEnabled: true, errors: [], ideas: [], successes: 0, failures: 0, reqId };
         const tIdeas = Date.now();
-        const ideasRes = await generateText({ model: openrouter("openrouter/auto"), prompt: ideasPrompt(context, locale, count, userPrompt) });
+        const ideasRes = await generateText({ model: openrouter("google/gemini-3-flash-preview"), prompt: ideasPrompt(context, locale, count, userPrompt) });
         console.log(`[assets.generate] ideas raw len=${(ideasRes.text ?? "").length} dur=${Date.now() - tIdeas}ms reqId=${reqId}`);
         let ideas = normalizeIdeas(String(ideasRes.text ?? ""), count);
         console.log(`[assets.generate] ideas normalized count=${ideas.length} list=${JSON.stringify(ideas)} reqId=${reqId}`);
         meta.ideas = ideas;
         if (ideas.length < count) ideas = [...ideas, ...["balloon", "confetti", "cake", "ribbon", "star", "gift", "party hat", "sparkles", "streamer", "cupcake"].slice(0, count - ideas.length)];
-        const calls = ideas.map((idea, i) => generateText({ model: openrouter("openrouter/auto"), prompt: svgPromptForIdea(idea, context) }).then(r => ({ ok: true, i, idea, text: r.text })).catch(err => ({ ok: false, i, idea, error: String(err?.message ?? err) })));
+        const calls = ideas.map((idea, i) => generateText({ model: openrouter("google/gemini-3-flash-preview"), prompt: svgPromptForIdea(idea, context) }).then(r => ({ ok: true, i, idea, text: r.text })).catch(err => ({ ok: false, i, idea, error: String(err?.message ?? err) })));
         const results = await Promise.allSettled(calls);
         let svgs: string[] = [];
         for (const r of results) {

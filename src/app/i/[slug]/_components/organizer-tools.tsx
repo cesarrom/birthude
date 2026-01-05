@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useInvitees, useAddInvitee, useDrawRaffleWinner, useStartTrivia } from "@/hooks/use-birthude-api";
 import { InviteeForm } from "@/components/invitee-form";
 
 export function OrganizerTools({ slug, items, rafflePrize, onStartTrivia, eventAt, raffleWinner }: { slug: string; items: string[]; rafflePrize?: string | null; onStartTrivia?: () => void; eventAt: string | Date; raffleWinner: string | null }) {
   const t = useTranslations("viewer");
+  const locale = useLocale();
   const [saving, setSaving] = useState(false);
   const [localWinner, setLocalWinner] = useState<string | null>(null);
   
@@ -99,19 +100,51 @@ export function OrganizerTools({ slug, items, rafflePrize, onStartTrivia, eventA
       onStartTrivia?.();
   }
 
+  function copyLink(identifier: string) {
+    const url = `${window.location.origin}/i/${slug}/viewer/${encodeURIComponent(identifier)}?lang=${locale}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert(t('linkCopied'));
+    });
+  }
+
   return (
     <div className="mt-6 rounded-xl border bg-white/70 p-4 shadow dark:bg-zinc-800">
       <div className="font-semibold flex justify-between items-center">
           {t('organizerTools')}
-          {/* Header button: Keep it for "Just for fun" trivia if no prize, or general access */}
-          {/* But user wants "Start quiz" specifically for prize decision if prize exists. */}
-          {/* We will hide this generic one if prize exists to avoid confusion, or keep it as generic */}
           {!rafflePrize && (
             <button onClick={startTrivia} className="text-xs bg-indigo-600 text-white px-2 py-1 rounded">{t('startTrivia')}</button>
           )}
       </div>
       <div className="mt-2">
         <InviteeForm onAdd={add} loading={saving} mode="tool" />
+      </div>
+      
+      {/* Invitees List */}
+      <div className="mt-6 border-t pt-4">
+        <div className="font-semibold mb-2">{t('status')} ({invitees.length})</div>
+        <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+            {invitees.map((inv: any) => (
+                <div key={inv.identifier} className="flex items-center justify-between p-2 bg-white/50 dark:bg-black/20 rounded-lg text-sm">
+                    <div className="flex flex-col">
+                        <div className="font-bold flex items-center gap-2">
+                            {inv.name || inv.identifier}
+                            {inv.isConfirmed ? (
+                                <span className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded">{t('confirmed')}</span>
+                            ) : (
+                                <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">{t('pending')}</span>
+                            )}
+                        </div>
+                        {inv.assignedItem && <div className="text-xs opacity-70">Item: {inv.assignedItem}</div>}
+                    </div>
+                    <button 
+                        onClick={() => copyLink(inv.identifier)}
+                        className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-medium"
+                    >
+                        {t('copyLink')}
+                    </button>
+                </div>
+            ))}
+        </div>
       </div>
       
       {items.length > 0 && (
