@@ -6,7 +6,7 @@ import { openrouter } from "@/lib/ai";
 import { prompts } from "./prompts";
 import { assignItemIfNotAssigned } from "../assign-item/route";
 
-const translationsWarning = `remember that you control literal slot elements where we place widgets, not the widgets themselves, widgets do not inherit tranlations so if you transform the slot, the widget will not be transformed AND it will look off.`;
+const translationsWarning = `slots always appear at the exact center of the screen, they are 300px x 300px, try not to put any text or other elements on top of them, remember that you control literal slot elements where we place widgets, not the widgets themselves, widgets do not inherit tranlations so if you transform the slot, the widget will not be transformed AND it will look off.`;
 // Slots definition
 const SLOTS = [
   { name: "MapComponent", description: "A map showing the event location. " + translationsWarning },
