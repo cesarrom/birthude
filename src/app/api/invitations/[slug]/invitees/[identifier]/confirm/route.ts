@@ -9,20 +9,16 @@ export async function POST(
   const { slug, identifier } = await params;
 
   try {
-    const inv = await db.query.invitations.findFirst({
-      where: eq(schema.invitations.slug, slug),
-    });
+    const [inv] = await db.select().from(schema.invitations).where(eq(schema.invitations.slug, slug)).limit(1);
 
     if (!inv) {
       return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
-    const invitee = await db.query.invitees.findFirst({
-      where: and(
+    const [invitee] = await db.select().from(schema.invitees).where(and(
         eq(schema.invitees.invitationId, inv.id),
         eq(schema.invitees.identifier, decodeURIComponent(identifier))
-      ),
-    });
+      )).limit(1);
 
     if (!invitee) {
       return NextResponse.json({ error: "Invitee not found" }, { status: 404 });

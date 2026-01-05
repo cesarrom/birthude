@@ -43,12 +43,18 @@
     "inviteeContext": "Contexte (ex. aime le jazz, déteste les araignées)",
     "confirmAssistance": "Confirmer la présence",
     "assistanceConfirmed": "Présence confirmée ✅",
+    "openMaps": "Ouvrir dans Maps",
     "createAction": "Créer l'invitation",
     "thinking": "Réflexion...",
     "invite": "Inviter",
     "selected": "Sélectionné"
   },
   "viewer": {
+    "copyLink": "Copier le Lien",
+    "linkCopied": "Copié !",
+    "status": "Statut",
+    "confirmed": "Confirmé",
+    "pending": "En attente",
     "identify": "Identifiez-vous",
     "placeholder": "Votre nom ou code",
     "reveal": "Révéler",
@@ -110,14 +116,8 @@
     "shortHour": "h",
     "shortMinute": "m",
     "shortSecond": "s",
-    "confirmAssistance": "Confirmer la Présence",
-    "assistanceConfirmed": "Présence Confirmée ✅",
-    "openMaps": "Ouvrir dans Maps",
-    "copyLink": "Copier le Lien",
-    "linkCopied": "Copié !",
-    "status": "Statut",
-    "confirmed": "Confirmé",
-    "pending": "En attente"
+    "confirmAssistance": "Confirmar la Présence",
+    "assistanceConfirmed": "Présence Confirmée ✅"
   },
   "page": {
     "notFound": "Non trouvé",
