@@ -253,9 +253,10 @@ function AssetsUpload({ initial, onSubmit, loading }: { initial?: { images: Res[
               try {
                   const json = await upload.mutateAsync({ data: r.source, mimeType, name: r.name || `image-${Date.now()}` });
                   if (json.fileUrl) uploaded.push({ name: r.name || "image", source: json.fileUrl, mimeType }); 
-                  else uploaded.push({ name: r.name || "image", source: r.source, mimeType });
+                  // If upload fails, we SKIP this image instead of sending blob, to avoid payload too large error
+                  else console.error("Upload failed for", r.name);
               } catch {
-                  uploaded.push({ name: r.name || "image", source: r.source, mimeType });
+                  console.error("Upload failed for", r.name);
               }
             } else {
               uploaded.push(r);
