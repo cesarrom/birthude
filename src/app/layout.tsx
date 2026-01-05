@@ -6,6 +6,7 @@ import "./globals.css";
 import LanguageSelector from "./language-selector";
 import QueryProvider from "@/providers/query-provider";
 import { DbHealthMonitor } from "@/components/db-health-monitor";
+import { LangSync } from "@/components/lang-sync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default async function RootLayout({
       <QueryProvider>
         <html lang={locale}>
           <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <LangSync />
             {children}
             <LanguageSelector />
             <DbHealthMonitor />

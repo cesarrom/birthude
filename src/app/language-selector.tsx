@@ -16,8 +16,10 @@ export default function LanguageSelector() {
        <select 
          className="bg-black/50 text-white backdrop-blur px-2 py-1 rounded-md text-xs border border-white/20" 
          onChange={(e) => {
-           document.cookie = `NEXT_LOCALE=${e.target.value}; path=/; max-age=31536000`;
-           window.location.reload();
+           document.cookie = `NEXT_LOCALE=${e.target.value}; path=/; max-age=31536000; SameSite=Lax`;
+           const url = new URL(window.location.href);
+           url.searchParams.delete('lang');
+           window.location.href = url.toString();
          }} 
          value={locale}
        >
