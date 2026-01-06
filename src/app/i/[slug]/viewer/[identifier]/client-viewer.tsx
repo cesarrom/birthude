@@ -24,10 +24,8 @@ import { ConfettiLauncher } from "../../_components/confetti-launcher";
 import { CountdownTarget } from "../../_components/countdown-target";
 import { OrganizerTools } from "../../_components/organizer-tools";
 import { RaffleRoulette } from "../../_components/raffle-roulette";
-import { getMessages } from "next-intl/server";
-import QueryProvider from "@/providers/query-provider";
-import { CalendarButton } from "@/components/calendar-button";
 import { DateDisplay } from "@/components/date-display";
+import { useDebounce } from 'use-debounce';
 
 gsap.registerPlugin(useGSAP);
 
@@ -112,8 +110,8 @@ export default function ClientViewer({ invitation, identifier }: { invitation: I
     }
   }
 
-  const [showWidget, setShowWidget] = useState('');
-
+  const [showWidgetRef, setShowWidget] = useState('');
+  const [showWidget] = useDebounce(showWidgetRef, 2500);
 
   // --- ENGINE INTEGRATION ---
   useEffect(() => {
@@ -217,65 +215,75 @@ export default function ClientViewer({ invitation, identifier }: { invitation: I
         <>
           <div ref={containerRef} className="fixed inset-0 z-10 h-[100dvh] w-[100dvw] bg-black" />
           <div slot="MapComponent">
-            {showWidget === 'MapComponent' ? (
-              <div className="z-10 relative" style={{ marginTop: '100px' }}>
-                <MapCanvas
-                  onClick={() => { }}
-                  marker={invitation.lat ? { lat: invitation.lat, lng: invitation.lng! } : undefined}
-                  center={invitation.lat ? { lat: invitation.lat, lng: invitation.lng! } : undefined}
-                  height={300}
-                  showExternalLink
-                  locationName={invitation.location}
-                />
+            {showWidgetRef && showWidget === 'MapComponent' && (
+              <div className="fixed inset-0 z-20 flex items-center justify-center p-6 pointer-events-none">
+                <div className="w-full max-w-md pointer-events-auto">
+                  <MapCanvas
+                    onClick={() => { }}
+                    marker={invitation.lat ? { lat: invitation.lat, lng: invitation.lng! } : undefined}
+                    center={invitation.lat ? { lat: invitation.lat, lng: invitation.lng! } : undefined}
+                    height={300}
+                    showExternalLink
+                    locationName={invitation.location}
+                  />
+                </div>
               </div>
-            ) : null}
+            )}
           </div>
           <div slot="CountdownComponent">
-            {showWidget === 'CountdownComponent' ? (
-              <div className="z-10 relative flex flex-col items-center gap-2" style={{ marginTop: '100px' }}>
-                <CountdownTarget
-                  eventAt={invitation.eventAt}
-                  eventDetails={{
-                    title: invitation.title,
-                    description: invitation.description || "",
-                    location: invitation.location,
-                  }}
-                  large
-                />
+            {showWidgetRef && showWidget === 'CountdownComponent' && (
+              <div className="fixed inset-0 z-20 flex items-center justify-center p-6 pointer-events-none">
+                <div className="pointer-events-auto">
+                  <CountdownTarget
+                    eventAt={invitation.eventAt}
+                    eventDetails={{
+                      title: invitation.title,
+                      description: invitation.description || "",
+                      location: invitation.location,
+                    }}
+                    large
+                  />
+                </div>
               </div>
-            ) : null}
+            )}
           </div>
           <div slot="DateComponent">
-            {showWidget === 'DateComponent' ? (
-              <div className="z-10 relative" style={{ marginTop: '100px' }}>
-                <DateDisplay
-                  date={invitation.eventAt}
-                  event={{
-                    title: invitation.title,
-                    description: invitation.description || "",
-                    location: invitation.location,
-                    start: invitation.eventAt
-                  }}
-                />
+            {showWidgetRef && showWidget === 'DateComponent' && (
+              <div className="fixed inset-0 z-20 flex items-center justify-center p-6 pointer-events-none">
+                <div className="pointer-events-auto">
+                  <DateDisplay
+                    date={invitation.eventAt}
+                    event={{
+                      title: invitation.title,
+                      description: invitation.description || "",
+                      location: invitation.location,
+                      start: invitation.eventAt
+                    }}
+                  />
+                </div>
               </div>
-            ) : null}
+            )}
           </div>
           <div slot="SlotMachineComponent">
-            {showWidget === 'SlotMachineComponent' ? (
-              <div className="z-10 relative" style={{ marginTop: '100px' }}>
-                <SlotMachinePro items={invitation.items} assignedItem={assigned || ""} />
+            {showWidgetRef && showWidget === 'SlotMachineComponent' && (
+              <div className="fixed inset-0 z-20 flex items-center justify-center p-6 pointer-events-none">
+                <div className="pointer-events-auto">
+                  <SlotMachinePro items={invitation.items} assignedItem={assigned || ""} />
+                </div>
               </div>
-            ) : null}
+            )}
           </div>
           <div slot="RSVPForm">
-            {showWidget === 'RSVPForm' ? (
-              <button
-                onClick={() => engineRef.current?.next()}
-                className="z-10 rounded-full bg-white text-black px-8 py-4 font-bold text-xl shadow-lg hover:scale-105 transition-transform"
-              >
-                {t('finish')}
-              </button>
-            ) : null}
+            {showWidgetRef && showWidget === 'RSVPForm' && (
+              <div className="fixed inset-0 z-20 flex items-center justify-center p-6 pointer-events-none">
+                <button
+                  onClick={() => engineRef.current?.next()}
+                  className="rounded-full bg-white text-black px-8 py-4 font-bold text-xl shadow-lg hover:scale-105 transition-transform pointer-events-auto"
+                >
+                  {t('finish')}
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}

@@ -112,10 +112,10 @@ export class SchemaEngine {
     }) {
         this.container = config.container;
         this.manifest = config.manifest;
-        this.manifest.timeline[this.manifest.timeline.length - 1].completion = {
+        console.log(JSON.stringify(this.manifest, null, 2));
+        Object.assign(this.manifest.timeline[this.manifest.timeline.length - 1].completion, {
             trigger: 'interaction',
-            label: '✔'
-        };
+        });
         this.slots = config.slots || {};
         this.uiLayer = document.getElementById('ui-layer') || this.container; // fallback
         this.uiLayer.setAttribute('style', this.manifest.timeline[0].pageStyle || '');

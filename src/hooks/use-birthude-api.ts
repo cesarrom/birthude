@@ -195,7 +195,7 @@ export function useRevealInvitee(slug: string) {
       const idNorm = identifier.trim().toLowerCase();
       let exData;
       const lang = new URLSearchParams(window.location.search).get("lang");
-      const query = lang ? `?lang=${lang}` : "";
+      const query = `?vw=${window.innerWidth}&vh=${window.innerHeight}${lang ? `&lang=${lang}` : ""}`;
 
       // 1. Try to fetch existing experience
       try {
