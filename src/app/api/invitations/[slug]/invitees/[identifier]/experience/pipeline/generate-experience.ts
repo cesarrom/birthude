@@ -256,8 +256,7 @@ All assets are created with \`opacity: 0\` (hidden) by default.
                     { targetId: "txt_form", type: "fromTo", fromVars: { autoAlpha: 0 }, vars: { autoAlpha: 1, duration: 0.5 } }, // NOTICE vars and/or fromVars are SET! this is MUST!
                     { targetId: "slot_rsvp", type: "fromTo", fromVars: { y: 100, autoAlpha: 0 }, vars: { y: 0, autoAlpha: 1, duration: 0.8, ease: "back.out" } } // NOTICE vars and/or fromVars are SET! this is MUST!
                 ],
-                // THIS WAITS FOR THE SLOT TO CALL engine.next()
-                completion: { trigger: "manual" } 
+                completion: { trigger: "interaction", label: "Submit" } 
             },
             // STEP 3: Final
             {
@@ -424,7 +423,7 @@ All assets are created with \`opacity: 0\` (hidden) by default.
                 { "type": "to", "targetId": "s6_balloon", "vars": { "autoAlpha": 0 } }
               ],
               "pageStyle": "background: linear-gradient(135deg, #11998e, #38ef7d);",
-              "completion": { "trigger": "manual" },
+              "completion": { "trigger": "interaction", label: "Finish" },
               "animationFlow": [
                 { "type": "fromTo", "targetId": "s7_title", "vars": { "autoAlpha": 1, "duration": 0.5 }, "fromVars": { "autoAlpha": 0 } },
                 { "type": "fromTo", "targetId": "slot_rsvp", "vars": { "y": 0, "autoAlpha": 1, "duration": 0.8, "ease": "back.out" }, "fromVars": { "y": 100, "autoAlpha": 0 } },
