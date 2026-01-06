@@ -84,6 +84,10 @@ export interface AssetToName {
   type: 'image' | 'svg';
 }
 
+export interface IsolatedAssetToName extends AssetToName {
+  backgroundColor: string;
+}
+
 export interface NameAssetsInput {
   assets: AssetToName[];
 }

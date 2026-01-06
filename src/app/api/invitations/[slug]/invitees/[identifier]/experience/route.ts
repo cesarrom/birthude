@@ -12,7 +12,9 @@ import {
   AssetToName,
   NamedAsset,
   Manifest,
+  IsolatedAssetToName,
 } from "./pipeline";
+import { isolateImageSubject } from "./pipeline/isolate-image-subject";
 
 const translationsWarning = `slots always appear at the exact center of the screen, they are 300px x 300px, try not to put any text or other elements on top of them, remember that you control literal slot elements where we place widgets, not the widgets themselves, widgets do not inherit translations so if you transform the slot, the widget will not be transformed AND it will look off.`;
 
@@ -42,6 +44,23 @@ function removeImgaeEnrichment(urlRef: string) {
   return url;
 }
 
+async function batchPromise<T>(promises: (() => Promise<T>)[], batchSize: number): Promise<T[]> {
+
+  const chunks = [];
+
+  for (let i = 0; i < promises.length; i += batchSize) {
+    chunks.push(promises.slice(i, i + batchSize));
+  }
+
+  const results = [];
+
+  for (const chunk of chunks) {
+    const chunkResults = await Promise.all(chunk.map(p => p()));
+    results.push(...chunkResults);
+  }
+
+  return results;
+}
 /**
  * Orchestrates the modular AI pipeline to generate the experience:
  * 
@@ -55,11 +74,23 @@ async function runPipeline(inv: any, invitee: any, locale: string, width: number
   const imgs = inv.assets?.images || [];
 
   // Prepare uploaded images as assets
-  const uploadedImages: AssetToName[] = imgs.map((img: any, i: number) => ({
+  const uploadedImagesNotIsolated: AssetToName[] = imgs.map((img: any, i: number) => ({
     id: `img_${i}`,
     url: enrichImageSource(img.source),
     type: 'image' as const,
   }));
+
+  const uploadedImages: IsolatedAssetToName[] = await batchPromise(
+    uploadedImagesNotIsolated.map((img) => async () => {
+      const ii = await isolateImageSubject(img);
+      return {
+        ...img,
+        url: ii.isolatedUrl,
+        backgroundColor: ii.backgroundColor,
+      }
+    }),
+    3
+  );
 
   // Step 1: Generate Copy
   console.log('[Pipeline] Step 1: Generating copy...');
@@ -129,24 +160,6 @@ async function runPipeline(inv: any, invitee: any, locale: string, width: number
   return manifest;
 }
 
-function createFallbackManifest(invitee: any, imgs: any[]): Manifest {
-  return {
-    assets: [
-      ...imgs.map((img, i) => ({ id: `img_${i}`, type: 'image' as const, src: img.source })),
-      { id: "t1", type: "text" as const, content: `Welcome ${invitee.name || 'Guest'}!`, css: { color: "white", fontSize: "3rem" } }
-    ],
-    timeline: [
-      {
-        id: "s1",
-        animationFlow: [
-          { targetId: "t1", type: "fromTo" as const, fromVars: { autoAlpha: 0, y: 50 }, vars: { autoAlpha: 1, y: 0, duration: 1 } }
-        ],
-        completion: { trigger: "manual" as const }
-      }
-    ]
-  };
-}
-
 export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: string; identifier: string }> }) {
   const { slug, identifier } = await ctx.params;
   const [inv] = await db.select().from(schema.invitations).where(eq(schema.invitations.slug, slug)).limit(1);
@@ -181,16 +194,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
     const locale = req.nextUrl.searchParams.get("lang") || req.cookies.get("NEXT_LOCALE")?.value || "en";
     const width = req.nextUrl.searchParams.get("vw") || '1080';
     const height = req.nextUrl.searchParams.get("vh") || '1920';
-    try {
-      json = await runPipeline(inv, row, locale, Number(width), Number(height));
-    } catch (e) {
-      console.error("Pipeline Error:", e);
-    }
-  }
-
-  // Fallback if pipeline fails or no API key
-  if (!json) {
-    json = createFallbackManifest(row, imgs);
+    json = await runPipeline(inv, row, locale, Number(width), Number(height));
   }
 
   // Persist the generated experience
