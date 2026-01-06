@@ -209,6 +209,8 @@ All assets are created with \`opacity: 0\` (hidden) by default.
 * Screens must never be bloated with too many elements. 1 main animated element, 1 or 2 secondary elements, and the text.
 * IT IS SUPER IMPORTANT TO CENTER THE RELEVANT TEXT HORIZONTALLY, AND IN THE MIDDLE OF THE SCREEN.
 * UNLESS INTENTIONAL, DO NOT STACK LOTS OF RESOURCES ONE ON TOP OF THE OTHER.
+* Slots when they are present, are always displayed at the center of the screen, fixed there, 300x300px, do not place things on top of them or covering them.
+* when a screen has completion of type "interaction", it means we are presenting a button, that button is always at the bottom of the screen, centered. do not place things on top of it or covering it.
 
 7. ** CSS Colors and Palette:**
 * With pageStyle, combined with asset css, you control the look and feel of each page, Always base it on the context provided by the user, it is now the same as the occasion.
