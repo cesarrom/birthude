@@ -249,10 +249,6 @@ export class SchemaEngine {
         el.style.alignItems = 'center';
         el.style.pointerEvents = 'none'; // Default to pass-through
 
-        if (asset.css) {
-            Object.assign(el.style, asset.css);
-        }
-
         // Default hidden
         // @ts-ignore (GSAP is global)
         gsap.set(el, { autoAlpha: 0 });
@@ -317,6 +313,10 @@ export class SchemaEngine {
                 el.style.pointerEvents = 'auto'; // Slots are interactive
                 el.appendChild(absoluteDiv);
                 break;
+        }
+
+        if (asset.css) {
+            Object.assign(el.style, asset.css);
         }
 
         Object.assign(asset, { actualElement: el });
