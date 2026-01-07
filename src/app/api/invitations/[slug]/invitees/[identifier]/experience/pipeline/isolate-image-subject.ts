@@ -85,7 +85,7 @@ async function processGeneratedImage(file: GeneratedFile): Promise<{ buffer: Buf
   if (info.channels !== 4) throw new Error("Image channels mismatch");
 
   // --- Detect chroma key by analyzing 2-pixel border ---
-  const borderWidth = 2;
+  const borderWidth = 10;
   const colorCounts: Map<string, number> = new Map();
 
   // Helper to get pixel index
