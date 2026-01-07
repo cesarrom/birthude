@@ -32,13 +32,9 @@ async function generateIsolatedImage(asset: AssetToName): Promise<{ file: Genera
             type: "text", text: `
             identify the main subject in this image, isolate it, even zoom in to the subject if needed for aspect ratio purposes
 
-your task is to replace everything that is NOT the main subject with a flat color, essentially isolating the main subject, this is because you are NOT capable of generating an image with transparency
+your task is to replace everything that is NOT the main subject with a magenta flat color, essentially isolating the main subject
 
-so Isolate the main subject
-
-place a flat high contrasting color around it (like bright green, magenta, or cyan)
-
-the entire border of the image must be filled with this flat color so I can detect it
+place a flat magenta color around it
             `
           },
           { type: "image", image: asset.url, mediaType: asset.type }
