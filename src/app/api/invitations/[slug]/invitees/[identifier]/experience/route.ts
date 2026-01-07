@@ -61,6 +61,87 @@ async function batchPromise<T>(promises: (() => Promise<T>)[], batchSize: number
 
   return results;
 }
+type IsolatedAssetCache = Array<{ originalUrl: string; isolatedUrl: string; backgroundColor: string }>;
+
+/**
+ * Gets isolated images, using cache when available to avoid expensive AI calls.
+ * Returns the isolated images and any newly processed ones that need to be cached.
+ */
+async function getIsolatedImages(
+  imgs: Array<{ name: string; source: string; mimeType: string }>,
+  existingCache: IsolatedAssetCache | null | undefined
+): Promise<{ isolatedImages: IsolatedAssetToName[]; newlyCached: IsolatedAssetCache }> {
+  const cache = existingCache || [];
+  const cacheMap = new Map(cache.map(c => [c.originalUrl, c]));
+
+  const uploadedImagesNotIsolated: AssetToName[] = imgs.map((img: any, i: number) => ({
+    id: `img_${i}`,
+    url: enrichImageSource(img.source),
+    type: 'image' as const,
+  }));
+
+  const isolatedImages: IsolatedAssetToName[] = [];
+  const toProcess: { index: number; asset: AssetToName }[] = [];
+
+  // Check cache for each image
+  for (let i = 0; i < uploadedImagesNotIsolated.length; i++) {
+    const asset = uploadedImagesNotIsolated[i];
+    const originalUrl = removeImgaeEnrichment(asset.url);
+    const cached = cacheMap.get(originalUrl);
+
+    if (cached) {
+      console.log(`[Pipeline] Using cached isolated image for: ${originalUrl}`);
+      isolatedImages[i] = {
+        ...asset,
+        url: cached.isolatedUrl,
+        backgroundColor: cached.backgroundColor,
+      };
+    } else {
+      toProcess.push({ index: i, asset });
+    }
+  }
+
+  // Process only uncached images
+  if (toProcess.length > 0) {
+    console.log(`[Pipeline] Processing ${toProcess.length} images (${uploadedImagesNotIsolated.length - toProcess.length} cached)`);
+
+    const processedResults = await batchPromise(
+      toProcess.map(({ asset }) => async () => {
+        const ii = await isolateImageSubject(asset);
+        return {
+          asset,
+          result: ii,
+        };
+      }),
+      3
+    );
+
+    // Place results in correct positions and build new cache entries
+    for (let i = 0; i < processedResults.length; i++) {
+      const { asset, result } = processedResults[i];
+      const { index } = toProcess[i];
+
+      isolatedImages[index] = {
+        ...asset,
+        url: result.isolatedUrl,
+        backgroundColor: result.backgroundColor,
+      };
+
+      // Add to cache
+      const originalUrl = removeImgaeEnrichment(asset.url);
+      cache.push({
+        originalUrl,
+        isolatedUrl: result.isolatedUrl,
+        backgroundColor: result.backgroundColor,
+      });
+    }
+  } else {
+    console.log(`[Pipeline] All ${uploadedImagesNotIsolated.length} images found in cache!`);
+  }
+
+  return { isolatedImages, newlyCached: cache };
+}
+
 /**
  * Orchestrates the modular AI pipeline to generate the experience:
  * 
@@ -70,26 +151,14 @@ async function batchPromise<T>(promises: (() => Promise<T>)[], batchSize: number
  * 4. pickAssetsForScreens - AI curates best assets per screen
  * 5. generateExperience - Assembles final Manifest JSON
  */
-async function runPipeline(inv: any, invitee: any, locale: string, width: number, height: number): Promise<Manifest> {
+async function runPipeline(inv: any, invitee: any, locale: string, width: number, height: number): Promise<{ manifest: Manifest; isolatedAssetsCache: IsolatedAssetCache }> {
   const imgs = inv.assets?.images || [];
 
-  // Prepare uploaded images as assets
-  const uploadedImagesNotIsolated: AssetToName[] = imgs.map((img: any, i: number) => ({
-    id: `img_${i}`,
-    url: enrichImageSource(img.source),
-    type: 'image' as const,
-  }));
-
-  const uploadedImages: IsolatedAssetToName[] = await batchPromise(
-    uploadedImagesNotIsolated.map((img) => async () => {
-      const ii = await isolateImageSubject(img);
-      return {
-        ...img,
-        url: ii.isolatedUrl,
-        backgroundColor: ii.backgroundColor,
-      }
-    }),
-    3
+  // Get isolated images with caching
+  console.log('[Pipeline] Step 0: Isolating images (with cache)...');
+  const { isolatedImages: uploadedImages, newlyCached: isolatedAssetsCache } = await getIsolatedImages(
+    imgs,
+    inv.isolatedAssets
   );
 
   // Step 1: Generate Copy
@@ -157,7 +226,7 @@ async function runPipeline(inv: any, invitee: any, locale: string, width: number
   );
   console.log('[Pipeline] Manifest generated with', manifest.assets.length, 'assets and', manifest.timeline.length, 'steps');
 
-  return manifest;
+  return { manifest, isolatedAssetsCache };
 }
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: string; identifier: string }> }) {
@@ -188,19 +257,28 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
   row.assignedItem = assignedItem;
 
   let json: Manifest | null = null;
-  const imgs = inv.assets?.images || [];
+  let isolatedAssetsCache: IsolatedAssetCache | null = null;
 
   if (process.env.OPENROUTER_API_KEY) {
     const locale = req.nextUrl.searchParams.get("lang") || req.cookies.get("NEXT_LOCALE")?.value || "en";
     const width = req.nextUrl.searchParams.get("vw") || '1080';
     const height = req.nextUrl.searchParams.get("vh") || '1920';
-    json = await runPipeline(inv, row, locale, Number(width), Number(height));
+    const result = await runPipeline(inv, row, locale, Number(width), Number(height));
+    json = result.manifest;
+    isolatedAssetsCache = result.isolatedAssetsCache;
   }
 
-  // Persist the generated experience
+  // Persist the generated experience to invitee
   await db.update(schema.invitees)
     .set({ experience: json })
     .where(and(eq(schema.invitees.invitationId, inv.id), eq(schema.invitees.identifier, identifier)));
+
+  // Persist the isolated assets cache to invitation (avoids reprocessing for other invitees)
+  if (isolatedAssetsCache && isolatedAssetsCache.length > 0) {
+    await db.update(schema.invitations)
+      .set({ isolatedAssets: isolatedAssetsCache })
+      .where(eq(schema.invitations.id, inv.id));
+  }
 
   return NextResponse.json({ experience: json }, { status: 201 });
 }

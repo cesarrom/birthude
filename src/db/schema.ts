@@ -14,6 +14,8 @@ export const invitations = pgTable("invitations", {
   rafflePrize: varchar("raffle_prize", { length: 256 }),
   raffleWinnerIdentifier: varchar("raffle_winner_identifier", { length: 128 }),
   assets: jsonb("assets").$type<{ images: Array<{ name: string; source: string; mimeType: string }>; videos: Array<{ name: string; source: string; mimeType: string }>; audios: Array<{ name: string; source: string; mimeType: string }> }>().default({ images: [], videos: [], audios: [] }).notNull(),
+  // Cache for isolated images to avoid repeated expensive AI processing
+  isolatedAssets: jsonb("isolated_assets").$type<Array<{ originalUrl: string; isolatedUrl: string; backgroundColor: string }>>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
