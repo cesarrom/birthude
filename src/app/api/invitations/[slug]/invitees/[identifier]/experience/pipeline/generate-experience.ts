@@ -37,7 +37,7 @@ const StepSchema = z.object({
   animationFlow: z.array(ActionSchema).describe("Animations to reveal current elements"),
   ambience: z.array(ActionSchema).optional().describe("Looping background animations"),
   completion: z.object({
-    trigger: z.enum(['auto', 'interaction', 'manual']),
+    trigger: z.enum(['auto', 'interaction']),
     delay: z.number().optional().describe("Delay in seconds if trigger is 'auto'"),
     label: z.string().optional().describe("Button label if trigger is 'interaction'"),
   }),
@@ -103,7 +103,7 @@ interface Step {
   animationFlow: Action[]; // Animations to reveal current elements
   ambience?: Action[];     // Looping background animations (e.g., floating bubbles)
   completion: {
-    trigger: 'auto' | 'interaction' | 'manual';
+    trigger: 'auto' | 'interaction';
     delay?: number;        // If trigger is 'auto'
     label?: string;        // Button label if trigger is 'interaction'
   };
