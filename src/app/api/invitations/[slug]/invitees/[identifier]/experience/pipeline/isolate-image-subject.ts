@@ -20,7 +20,7 @@ export interface IsolatedImageResult {
 
 async function generateIsolatedImage(asset: AssetToName): Promise<{ file: GeneratedFile }> {
   // Use a vision-capable model
-  const model = openrouter("google/gemini-2.5-flash-image"); // or google/gemini-3-pro-image-preview
+  const model = openrouter("google/gemini-3-pro-image-preview"); // or google/gemini-3-pro-image-preview
 
   const { files } = await generateText({
     model,
