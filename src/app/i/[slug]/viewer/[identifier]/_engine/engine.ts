@@ -316,7 +316,15 @@ export class SchemaEngine {
         }
 
         if (asset.css) {
-            Object.assign(el.style, asset.css);
+            const style = el.style as any;
+            for (const [key, value] of Object.entries(asset.css)) {
+                if (value?.toString().includes('rem')) {
+                    const valNum = parseFloat(value?.toString().replace('rem', ''));
+                    style[key] = (valNum * 0.8) + 'rem';
+                } else {
+                    style[key] = value;
+                }
+            }
         }
 
         Object.assign(asset, { actualElement: el });
