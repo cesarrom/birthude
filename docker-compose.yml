@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-birthude}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-birthude}
+      POSTGRES_DB: ${POSTGRES_DB:-birthude}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-birthude} -d ${POSTGRES_DB:-birthude}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # No ports exposed - internal network only (Dokploy handles external access)
+
+  # Database migrations
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["sh", "-c", "pnpm drizzle-kit migrate"]
+    environment:
+      POSTGRES_URL: postgres://${POSTGRES_USER:-birthude}:${POSTGRES_PASSWORD:-birthude}@db:5432/${POSTGRES_DB:-birthude}
+    depends_on:
+      db:
+        condition: service_healthy
+    # Run migrations and exit
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # Database - uses internal Docker network
+      POSTGRES_URL: postgres://${POSTGRES_USER:-birthude}:${POSTGRES_PASSWORD:-birthude}@db:5432/${POSTGRES_DB:-birthude}
+      
+      # NextAuth - external URL must be set via env
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      
+      # AI Services
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      
+      # Geocoding
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY}
+      
+      # File Upload
+      BYTESCALE_ACCOUNT_ID: ${BYTESCALE_ACCOUNT_ID}
+      BYTESCALE_API_KEY: ${BYTESCALE_API_KEY}
+      
+      # Payment (dLocal Go)
+      DLOCAL_GO_API_KEY: ${DLOCAL_GO_API_KEY}
+      DLOCAL_GO_SECRET_KEY: ${DLOCAL_GO_SECRET_KEY}
+      DLOCAL_GO_ENV: ${DLOCAL_GO_ENV:-sandbox}
+      
+      # Node
+      NODE_ENV: production
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    # No ports exposed - Dokploy handles routing
+    # The app listens on port 3000 internally
+
+volumes:
+  postgres_data:

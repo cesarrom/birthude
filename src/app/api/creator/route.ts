@@ -10,7 +10,6 @@ type StepId =
   | "items"
   | "invitees"
   | "assets"
-  | "assets_ai"
   | "raffle"
   | "final";
 
@@ -18,22 +17,22 @@ const labels: Record<string, Record<string, string>> = {
   en: {
     title: "Title", theme: "Theme", eventAt: "Date & Time", location: "Location",
     description: "Description", items: "Things to bring", invitees: "Invitees",
-    assets: "Resources", assets_ai: "AI Resources", rafflePrize: "Raffle Prize"
+    assets: "Resources", rafflePrize: "Raffle Prize"
   },
   es: {
     title: "Título", theme: "Tema", eventAt: "Fecha y Hora", location: "Ubicación",
     description: "Descripción", items: "Cosas para llevar", invitees: "Invitados",
-    assets: "Recursos", assets_ai: "Recursos IA", rafflePrize: "Premio del sorteo"
+    assets: "Recursos", rafflePrize: "Premio del sorteo"
   },
   fr: {
     title: "Titre", theme: "Thème", eventAt: "Date et Heure", location: "Lieu",
     description: "Description", items: "Choses à apporter", invitees: "Invités",
-    assets: "Ressources", assets_ai: "Ressources IA", rafflePrize: "Prix de la tombola"
+    assets: "Ressources", rafflePrize: "Prix de la tombola"
   },
   pt: {
     title: "Título", theme: "Tema", eventAt: "Data e Hora", location: "Localização",
     description: "Descrição", items: "Coisas para levar", invitees: "Convidados",
-    assets: "Recursos", assets_ai: "Recursos de IA", rafflePrize: "Prêmio do sorteio"
+    assets: "Recursos", rafflePrize: "Prêmio do sorteio"
   }
 };
 
@@ -47,7 +46,6 @@ function getSteps(locale: string) {
     { id: "items", input: { type: "list", field: { id: "items", label: l.items } } },
     { id: "invitees", input: { type: "invitees", field: { id: "invitees", label: l.invitees } } },
     { id: "assets", input: { type: "assets_upload", field: { id: "assets", label: l.assets } } },
-    { id: "assets_ai", input: { type: "assets_ai", field: { id: "assets", label: l.assets_ai } } },
     { id: "raffle", input: { type: "raffle", field: { id: "rafflePrize", label: l.rafflePrize } } },
   ];
 }
@@ -60,8 +58,7 @@ const fallbackMessages: Record<string, Record<StepId, string>> = {
     description: "Describe the party. Any notes, dress code, or special message?",
     items: "What should guests bring? Add items one by one and press Done.",
     invitees: "Add invitees: name, age, optional image, and mark organizers.",
-    assets: "Attach your resources: upload images or paste URLs. Next, we'll check AI suggestions.",
-    assets_ai: "Select AI-generated SVG resources for your invitation.",
+    assets: "Attach your resources: upload images or paste URLs.",
     raffle: "Will there be a raffle? Enter the prize or choose 'No raffle'.",
     final: "All set.",
   },
@@ -72,8 +69,7 @@ const fallbackMessages: Record<string, Record<StepId, string>> = {
     description: "Describe la fiesta. ¿Alguna nota, código de vestimenta o mensaje especial?",
     items: "¿Qué deben traer los invitados? Añade artículos uno por uno y pulsa Listo.",
     invitees: "Añade invitados: nombre, edad, imagen opcional y marca organizadores.",
-    assets: "Adjunta tus recursos: sube imágenes o pega URLs. Después, pasamos a sugerencias AI.",
-    assets_ai: "Selecciona recursos SVG generados por IA para tu invitación.",
+    assets: "Adjunta tus recursos: sube imágenes o pega URLs.",
     raffle: "¿Habrá sorteo? Ingresa el premio o elige 'Sin sorteo'.",
     final: "Todo listo.",
   },
@@ -84,8 +80,7 @@ const fallbackMessages: Record<string, Record<StepId, string>> = {
     description: "Décrivez la fête. Des notes, un code vestimentaire ou un message spécial ?",
     items: "Que doivent apporter les invités ? Ajoutez des articles un par un et appuyez sur Terminé.",
     invitees: "Ajoutez des invités : nom, âge, image facultative et marquez les organisateurs.",
-    assets: "Joignez vos ressources : téléchargez des images ou collez des URL. Ensuite, nous passerons aux suggestions de l'IA.",
-    assets_ai: "Sélectionnez des ressources SVG générées par l'IA pour votre invitation.",
+    assets: "Joignez vos ressources : téléchargez des images ou collez des URL.",
     raffle: "Y aura-t-il une tombola ? Entrez le prix ou choisissez 'Pas de tombola'.",
     final: "Tout est prêt.",
   },
@@ -96,8 +91,7 @@ const fallbackMessages: Record<string, Record<StepId, string>> = {
     description: "Descreva a festa. Alguma nota, código de vestimenta ou mensagem especial?",
     items: "O que os convidados devem trazer? Adicione itens um por um e pressione Concluído.",
     invitees: "Adicione convidados: nome, idade, imagem opcional e marque organizadores.",
-    assets: "Anexe seus recursos: envie imagens ou cole URLs. Em seguida, passaremos para as sugestões de IA.",
-    assets_ai: "Selecione recursos SVG gerados por IA para o seu convite.",
+    assets: "Anexe seus recursos: envie imagens ou cole URLs.",
     raffle: "Haverá um sorteio? Digite o prêmio ou escolha 'Sem sorteio'.",
     final: "Tudo pronto.",
   }
@@ -129,7 +123,7 @@ export async function POST(req: NextRequest) {
           prompt: `Summarize this birthday invitation in a friendly tone in language code "${locale}":\n${JSON.stringify(answers)}`,
         });
         summary = text;
-      } catch {}
+      } catch { }
     }
     return NextResponse.json({ step: "final", message: summary, input: null, cta: { label: "Create Invitation" } });
   }
@@ -144,7 +138,7 @@ export async function POST(req: NextRequest) {
         `,
       });
       message = text;
-    } catch {}
+    } catch { }
   }
 
   return NextResponse.json({ step: step.id, message, input: step.input });

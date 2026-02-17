@@ -103,7 +103,6 @@
     "answers": "Answers",
     "pickWinner": "Pick Winner",
     "anon": "Anonymous",
-    "seconds": "s",
     "gameInProgress": "Game in progress! Redirecting...",
     "eventStarted": "The event has started!",
     "months": "Months",
@@ -117,7 +116,10 @@
     "shortMinute": "m",
     "shortSecond": "s",
     "confirmAssistance": "Confirm Assistance",
-    "assistanceConfirmed": "Assistance Confirmed ✅"
+    "assistanceConfirmed": "Assistance Confirmed ✅",
+    "oops": "Oops!",
+    "creditsExhausted": "This invitation experience is currently unavailable. Please contact the person who invited you.",
+    "backToHome": "Back to home"
   },
   "page": {
     "notFound": "Not found",

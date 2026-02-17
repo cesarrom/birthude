@@ -1,7 +1,54 @@
 import { pgTable, uuid, varchar, text, timestamp, jsonb, doublePrecision, integer, boolean } from "drizzle-orm/pg-core";
 
+// ================= AUTH & USER TABLES =================
+
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  image: varchar("image", { length: 512 }),
+  credits: integer("credits").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type User = typeof users.$inferSelect;
+
+// ================= PAYMENT TABLES =================
+
+export const invitationPackages = pgTable("invitation_packages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 128 }).notNull(),
+  description: text("description"),
+  credits: integer("credits").notNull(), // Number of invitees you can add
+  priceUsd: integer("price_usd").notNull(), // Price in cents (e.g., 999 = $9.99)
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type InvitationPackage = typeof invitationPackages.$inferSelect;
+
+export const payments = pgTable("payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  packageId: uuid("package_id").notNull().references(() => invitationPackages.id),
+  providerPaymentId: varchar("provider_payment_id", { length: 255 }), // dLocal Go payment ID
+  providerPayerId: varchar("provider_payer_id", { length: 255 }), // dLocal Go payer info
+  status: varchar("status", { length: 32 }).default("pending").notNull(), // pending, completed, failed, refunded
+  amountUsd: integer("amount_usd").notNull(), // Amount in cents
+  creditsGranted: integer("credits_granted").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export type Payment = typeof payments.$inferSelect;
+
+// ================= INVITATION TABLES =================
+
 export const invitations = pgTable("invitations", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }), // Creator of the invitation
   slug: varchar("slug", { length: 64 }).notNull().unique(),
   title: varchar("title", { length: 256 }).notNull(),
   theme: varchar("theme", { length: 128 }).notNull(),

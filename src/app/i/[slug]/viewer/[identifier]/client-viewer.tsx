@@ -72,8 +72,11 @@ export default function ClientViewer({ invitation, identifier }: { invitation: I
     loadExperience();
   }, [identifier]);
 
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
+
   async function loadExperience() {
     setViewMode('loading');
+    setErrorStatus(null);
     console.log("[ClientViewer] Loading experience for:", identifier);
     try {
       const data: any = await revealInvitee.mutateAsync(identifier);
@@ -93,10 +96,15 @@ export default function ClientViewer({ invitation, identifier }: { invitation: I
       } else {
         setViewMode('playing');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("[ClientViewer] Load failed", e);
-      // Fallback to final if load fails? Or show error?
-      setViewMode('final');
+      // If we got a 402 or other error from the API, we might want to show it
+      if (e.status === 402) {
+        setErrorStatus(402);
+      } else {
+        // Fallback to final for other errors to avoid blocking the user entirely if possible
+        setViewMode('final');
+      }
     }
   }
 
@@ -200,8 +208,27 @@ export default function ClientViewer({ invitation, identifier }: { invitation: I
         </div>
       )}
 
+      {/* Error Screen */}
+      {errorStatus === 402 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 px-6 text-center">
+          <div className="max-w-xs">
+            <div className="text-5xl mb-4">⏳</div>
+            <h2 className="text-2xl font-bold mb-2">{t('oops')}</h2>
+            <p className="opacity-70 text-sm">
+              {t('creditsExhausted')}
+            </p>
+            <button
+              onClick={() => router.push('/')}
+              className="mt-6 text-xs text-white/50 underline"
+            >
+              {t('backToHome')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Loading Screen */}
-      {viewMode === 'loading' && (
+      {viewMode === 'loading' && !errorStatus && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-gradient-to-br from-purple-700 to-pink-600">
           <div className="flex flex-col items-center text-white">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />

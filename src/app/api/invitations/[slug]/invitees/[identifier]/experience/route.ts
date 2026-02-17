@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { assignItemIfNotAssigned } from "../assign-item/route";
 import {
   generateCopy,
@@ -260,6 +260,28 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
   let isolatedAssetsCache: IsolatedAssetCache | null = null;
 
   if (process.env.OPENROUTER_API_KEY) {
+    // CREDIT VALIDATION & CONSUMPTION
+    if (inv.userId) {
+      const [creator] = await db.select({ credits: schema.users.credits }).from(schema.users).where(eq(schema.users.id, inv.userId));
+
+      if (!creator || creator.credits < 1) {
+        return NextResponse.json({
+          error: "The creator of this invitation has run out of credits. Experience cannot be generated.",
+          code: "INSUFFICIENT_CREDITS"
+        }, { status: 402 });
+      }
+
+      // Consume 1 credit from creator
+      await db.update(schema.users)
+        .set({
+          credits: sql`${schema.users.credits} - 1`,
+          updatedAt: new Date()
+        })
+        .where(eq(schema.users.id, inv.userId));
+
+      console.log(`[Credits] Consumed 1 credit from user ${inv.userId}. Remaining: ${creator.credits - 1}`);
+    }
+
     const locale = req.nextUrl.searchParams.get("lang") || req.cookies.get("NEXT_LOCALE")?.value || "en";
     const width = req.nextUrl.searchParams.get("vw") || '1080';
     const height = req.nextUrl.searchParams.get("vh") || '1920';
@@ -282,3 +304,4 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
 
   return NextResponse.json({ experience: json }, { status: 201 });
 }
+

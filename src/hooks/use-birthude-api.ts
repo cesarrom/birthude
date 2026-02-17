@@ -73,16 +73,7 @@ export function useListify() {
   });
 }
 
-export function useGenerateAssets() {
-  return useMutation({
-    mutationFn: (body: { context: any; count?: number; userPrompt?: string }) =>
-      fetcher("/api/assets/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      })
-  });
-}
+
 
 export function useUploadFile() {
   return useMutation({

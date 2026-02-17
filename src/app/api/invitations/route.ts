@@ -3,6 +3,7 @@ import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { store } from "@/lib/store";
+import { auth } from "@/lib/auth";
 
 const createInvitationSchema = z.object({
   title: z.string().min(1),
@@ -38,10 +39,24 @@ function slugify(input: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const json = await req.json();
     console.log("create-invitation request", json);
     const data = createInvitationSchema.parse(json);
+
+    // Validate credits
+    const [user] = await db.select({ credits: schema.users.credits }).from(schema.users).where(eq(schema.users.id, session.user.id));
+    if (!user || user.credits < data.invitees.length) {
+      return NextResponse.json({
+        error: `Insufficient credits. You need ${data.invitees.length} credits but have ${user?.credits ?? 0}.`,
+        code: "INSUFFICIENT_CREDITS"
+      }, { status: 402 });
+    }
 
     let baseSlug = slugify(data.title);
     if (!baseSlug) baseSlug = "invite";
@@ -52,6 +67,7 @@ export async function POST(req: NextRequest) {
         .insert(schema.invitations)
         .values({
           slug: uniqueSlug,
+          userId: session.user.id,
           title: data.title,
           theme: data.theme,
           description: data.description,
@@ -79,7 +95,8 @@ export async function POST(req: NextRequest) {
         );
       }
       return NextResponse.json({ invitation: inserted[0] }, { status: 201 });
-    } catch {
+    } catch (dbErr: any) {
+      console.error("DB insertion failed, falling back to store", dbErr);
       const inv = store.saveInvitation({
         slug: uniqueSlug,
         title: data.title,
@@ -105,6 +122,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message ?? "Invalid request", details }, { status: 400 });
   }
 }
+
 
 export async function GET() {
   try {

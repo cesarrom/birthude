@@ -5,6 +5,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import "./globals.css";
 import LanguageSelector from "./language-selector";
 import QueryProvider from "@/providers/query-provider";
+import AuthProvider from "@/providers/auth-provider";
 import { DbHealthMonitor } from "@/components/db-health-monitor";
 import { LangSync } from "@/components/lang-sync";
 
@@ -33,16 +34,18 @@ export default async function RootLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <QueryProvider>
-        <html lang={locale}>
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            <LangSync />
-            {children}
-            <LanguageSelector />
-            <DbHealthMonitor />
-          </body>
-        </html>
-      </QueryProvider>
+      <AuthProvider>
+        <QueryProvider>
+          <html lang={locale}>
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+              <LangSync />
+              {children}
+              <LanguageSelector />
+              <DbHealthMonitor />
+            </body>
+          </html>
+        </QueryProvider>
+      </AuthProvider>
     </NextIntlClientProvider>
   );
 }

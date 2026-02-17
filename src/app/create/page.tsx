@@ -7,10 +7,10 @@ import "leaflet/dist/leaflet.css";
 type Message = { role: "assistant" | "user"; content: string };
 
 import { useTranslations } from 'next-intl';
-import { 
-  useCreatorChat, useCreateInvitation, useGenerateInvitation, 
-  useEnhanceText, useListify, useGenerateAssets, useUploadFile, 
-  useGeoAutocomplete, useGeoReverse 
+import {
+  useCreatorChat, useCreateInvitation, useGenerateInvitation,
+  useEnhanceText, useListify, useUploadFile,
+  useGeoAutocomplete, useGeoReverse
 } from "@/hooks/use-birthude-api";
 
 export default function CreateInvitationPage() {
@@ -20,7 +20,7 @@ export default function CreateInvitationPage() {
   const [inputMeta, setInputMeta] = useState<any>(null);
   const [stepId, setStepId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<any>({ items: [], assets: { images: [], videos: [], audios: [] } });
-  
+
   const creatorChat = useCreatorChat();
   const createInv = useCreateInvitation();
   const genInv = useGenerateInvitation();
@@ -31,12 +31,12 @@ export default function CreateInvitationPage() {
 
   async function bootstrap() {
     try {
-        const data = await creatorChat.mutateAsync({ stepId: null, answers });
-        setMessages([{ role: "assistant", content: data.message }]);
-        setInputMeta(data.input);
-        setStepId(data.step);
+      const data = await creatorChat.mutateAsync({ stepId: null, answers });
+      setMessages([{ role: "assistant", content: data.message }]);
+      setInputMeta(data.input);
+      setStepId(data.step);
     } catch (e) {
-        console.error(e);
+      console.error(e);
     }
   }
 
@@ -46,12 +46,12 @@ export default function CreateInvitationPage() {
 
   async function proceed() {
     try {
-        const data = await creatorChat.mutateAsync({ stepId, answers });
-        setMessages((m) => [...m, { role: "assistant", content: data.message }]);
-        setInputMeta(data.input);
-        setStepId(data.step);
+      const data = await creatorChat.mutateAsync({ stepId, answers });
+      setMessages((m) => [...m, { role: "assistant", content: data.message }]);
+      setInputMeta(data.input);
+      setStepId(data.step);
     } catch (e) {
-        console.error(e);
+      console.error(e);
     }
   }
 
@@ -69,17 +69,17 @@ export default function CreateInvitationPage() {
       assets: answers.assets ?? { images: [], videos: [], audios: [] },
       invitees: answers.invitees ?? [],
     };
-    
+
     try {
-        const data: any = await createInv.mutateAsync(payload);
-        if (!data?.invitation?.slug) throw new Error("No slug");
-        
-        const slug: string = data.invitation.slug;
-        await genInv.mutateAsync(slug);
-        router.push(`/i/${slug}`);
+      const data: any = await createInv.mutateAsync(payload);
+      if (!data?.invitation?.slug) throw new Error("No slug");
+
+      const slug: string = data.invitation.slug;
+      await genInv.mutateAsync(slug);
+      router.push(`/i/${slug}`);
     } catch (e) {
-        console.error("create-invitation failed", e);
-        setMessages((m) => [...m, { role: "assistant", content: "No se pudo crear la invitación. Revisa los campos obligatorios (título, fecha, ubicación)." }]);
+      console.error("create-invitation failed", e);
+      setMessages((m) => [...m, { role: "assistant", content: "No se pudo crear la invitación. Revisa los campos obligatorios (título, fecha, ubicación)." }]);
     }
   }
 
@@ -112,9 +112,7 @@ export default function CreateInvitationPage() {
             <AssetsUpload initial={answers.assets} onSubmit={async (assets) => { pushUserMessage(`Tus recursos: ${assets.images.length} imágenes`); setAnswers((a: any) => ({ ...a, assets })); await proceed(); }} />
           )}
 
-          {inputMeta?.type === "assets_ai" && (
-            <AssetsAISelect context={answers} onSubmit={async (picked) => { const merged = { ...answers.assets, images: [...(answers.assets?.images ?? []), ...picked] }; pushUserMessage(`AI seleccionadas: ${picked.length}`); setAnswers((a: any) => ({ ...a, assets: merged })); await proceed(); }} />
-          )}
+
 
           {inputMeta?.type === "map" && (
             <LocationPicker onSubmit={async (loc) => { pushUserMessage(`${loc.address} (${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)})`); setAnswers((a: any) => ({ ...a, location: loc.address, lat: loc.lat, lng: loc.lng })); await proceed(); }} />
@@ -149,9 +147,9 @@ function TextInput({ fieldId, label, context, onSubmit, loading }: { fieldId?: s
   async function handleEnhance() {
     if (!fieldId || !val.trim()) return;
     try {
-        const data: any = await enhance.mutateAsync({ field: fieldId, text: val, context });
-        if (data.result) setVal(data.result);
-    } catch {}
+      const data: any = await enhance.mutateAsync({ field: fieldId, text: val, context });
+      if (data.result) setVal(data.result);
+    } catch { }
   }
   return (
     <div className="flex gap-2">
@@ -190,15 +188,15 @@ function ListBuilder({ label, values, context, onAdd, onRemove, onDone, loading 
   const listify = useListify();
 
   async function handleAI(seed: string) {
-      if (!seed.trim()) return;
-      try {
-          const data: any = await listify.mutateAsync({ text: seed, context });
-          if (Array.isArray(data.items)) {
-              for (const it of data.items) {
-                 onAdd(it);
-              }
-          }
-      } catch {}
+    if (!seed.trim()) return;
+    try {
+      const data: any = await listify.mutateAsync({ text: seed, context });
+      if (Array.isArray(data.items)) {
+        for (const it of data.items) {
+          onAdd(it);
+        }
+      }
+    } catch { }
   }
 
   return (
@@ -251,12 +249,12 @@ function AssetsUpload({ initial, onSubmit, loading }: { initial?: { images: Res[
             if (r.source.startsWith("data:")) {
               const mimeType = r.source.slice(5, r.source.indexOf(";"));
               try {
-                  const json = await upload.mutateAsync({ data: r.source, mimeType, name: r.name || `image-${Date.now()}` });
-                  if (json.fileUrl) uploaded.push({ name: r.name || "image", source: json.fileUrl, mimeType }); 
-                  // If upload fails, we SKIP this image instead of sending blob, to avoid payload too large error
-                  else console.error("Upload failed for", r.name);
+                const json = await upload.mutateAsync({ data: r.source, mimeType, name: r.name || `image-${Date.now()}` });
+                if (json.fileUrl) uploaded.push({ name: r.name || "image", source: json.fileUrl, mimeType });
+                // If upload fails, we SKIP this image instead of sending blob, to avoid payload too large error
+                else console.error("Upload failed for", r.name);
               } catch {
-                  console.error("Upload failed for", r.name);
+                console.error("Upload failed for", r.name);
               }
             } else {
               uploaded.push(r);
@@ -269,160 +267,7 @@ function AssetsUpload({ initial, onSubmit, loading }: { initial?: { images: Res[
   );
 }
 
-function AssetsAISelect({ context, onSubmit, loading }: { context: any; onSubmit: (picked: Res[]) => void; loading?: boolean }) {
-  const t = useTranslations('create');
-  const [svgs, setSvgs] = useState<string[]>([]);
-  const [selected, setSelected] = useState<Record<number, boolean>>({});
-  const [notice, setNotice] = useState<string>("");
-  const gen = useGenerateAssets();
-  const upload = useUploadFile();
-  const [uploading, setUploading] = useState(false);
-  const [loadingIndices, setLoadingIndices] = useState<number[]>([]);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [customPrompt, setCustomPrompt] = useState("");
 
-  useEffect(() => { generate(); }, []);
-  
-  async function generate(overridePrompt?: string) {
-    const selectedIndices = Object.entries(selected).filter(([_, v]) => v).map(([k]) => Number(k));
-    const count = selectedIndices.length > 0 ? selectedIndices.length : 10;
-    
-    if (selectedIndices.length > 0) {
-        setLoadingIndices(selectedIndices);
-    } else {
-        setLoadingIndices(Array.from({ length: 10 }, (_, i) => i));
-    }
-    
-    setShowPrompt(false);
-
-    try {
-        const data: any = await gen.mutateAsync({ context, count, userPrompt: overridePrompt || customPrompt || undefined });
-        const newSvgs = Array.isArray(data.svgs) ? data.svgs : [];
-        
-        if (selectedIndices.length > 0) {
-            setSvgs(prev => {
-                const next = [...prev];
-                selectedIndices.forEach((idx, i) => {
-                    if (newSvgs[i]) next[idx] = newSvgs[i];
-                });
-                return next;
-            });
-            setSelected({});
-        } else {
-            setSvgs(newSvgs);
-            setSelected({});
-        }
-        
-        setNotice(String(data.notice || ""));
-    } catch {} finally {
-        setLoadingIndices([]);
-    }
-  }
-  
-  function selectAll() { const next: Record<number, boolean> = {}; for (let i = 0; i < svgs.length; i++) next[i] = true; setSelected(next); }
-  
-  async function applySelection() {
-    setUploading(true);
-    const picks: Res[] = [];
-    const sel = Object.entries(selected).filter(([_, v]) => v).map(([k]) => Number(k));
-    for (const i of sel) {
-      const svg = svgs[i];
-      const base64 = btoa(unescape(encodeURIComponent(svg)));
-      const dataUrl = `data:image/svg+xml;base64,${base64}`;
-      let fileUrl = null;
-      try {
-        const json = await upload.mutateAsync({ data: dataUrl, mimeType: "image/svg+xml", name: `ai-${Date.now()}-${i}.svg` });
-        if (json.fileUrl) fileUrl = json.fileUrl;
-      } catch {}
-      
-      if (fileUrl) {
-          picks.push({ name: `ai-${i}.svg`, source: fileUrl, mimeType: "image/svg+xml" });
-      } else {
-          console.error("Failed to upload AI asset", i);
-      }
-    }
-    setUploading(false);
-    if (!picks.length) return;
-    onSubmit(picks);
-  }
-
-  function deleteSelected() {
-    setSvgs(prev => prev.filter((_, i) => !selected[i]));
-    setSelected({});
-  }
-  
-  const selectedCount = Object.values(selected).filter(Boolean).length;
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="text-sm opacity-80">{t('selectAI')}</div>
-        <div className="flex items-center gap-2">
-            {selectedCount > 0 && (
-                <button className="rounded-xl border px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={deleteSelected} title={t('delete')}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                </button>
-            )}
-            <div className="relative flex items-center">
-                <button className="rounded-l-xl border-y border-l px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-800" disabled={gen.isPending} onClick={() => generate()}>
-                  {selectedCount > 0 ? t('regenerateCount', { count: selectedCount }) : t('regenerate')}
-                </button>
-                <button className="rounded-r-xl border px-2 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-800" disabled={gen.isPending} onClick={() => setShowPrompt(!showPrompt)}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                </button>
-                {showPrompt && (
-                    <div className="absolute right-0 top-full mt-2 z-20 w-72 rounded-xl border bg-white p-3 shadow-xl dark:bg-zinc-800">
-                        <textarea 
-                            className="w-full rounded-lg border px-3 py-2 text-sm min-h-[80px]" 
-                            placeholder={t('customPrompt')} 
-                            value={customPrompt} 
-                            onChange={(e) => setCustomPrompt(e.target.value)}
-                        />
-                        <button 
-                            className="mt-2 w-full rounded-lg bg-black py-2 text-sm text-white dark:bg-zinc-200 dark:text-black"
-                            onClick={() => generate()}
-                        >
-                            {t('generateWithPrompt')}
-                        </button>
-                    </div>
-                )}
-            </div>
-        </div>
-      </div>
-      {notice && (
-        <div className="rounded-xl border bg-yellow-100 px-3 py-2 text-sm text-yellow-900">{notice}</div>
-      )}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {svgs.map((svg, i) => (
-          <div key={i} className="relative group">
-            <button 
-                className={`w-full h-full rounded-xl border p-2 transition-all ${selected[i] ? "ring-2 ring-purple-600 bg-purple-50 dark:bg-purple-900/20" : "hover:border-purple-300"}`} 
-                onClick={() => setSelected((s) => ({ ...s, [i]: !s[i] }))} 
-                dangerouslySetInnerHTML={{ __html: svg }} 
-            />
-            {loadingIndices.includes(i) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-black/60 rounded-xl backdrop-blur-[1px] transition-all">
-                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-purple-600 border-t-transparent" />
-                </div>
-            )}
-            <div className={`absolute top-2 right-2 h-4 w-4 rounded-full border border-purple-600 ${selected[i] ? "bg-purple-600" : "bg-transparent opacity-0 group-hover:opacity-50"} transition-all pointer-events-none`} />
-          </div>
-        ))}
-        {/* Fill empty slots if generating initial batch and svgs is empty */}
-        {svgs.length === 0 && loadingIndices.length > 0 && loadingIndices.map((i) => (
-             <div key={i} className="aspect-square rounded-xl border bg-zinc-100 dark:bg-zinc-800 animate-pulse" />
-        ))}
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="text-sm opacity-70">{t('selected')}: {selectedCount}</div>
-        <div className="flex gap-2">
-          <button className="rounded-xl border px-4 py-3" onClick={selectAll}>{t('selectAll')}</button>
-          <button className="rounded-xl bg-black px-5 py-3 text-white dark:bg-zinc-200 dark:text-black" disabled={!selectedCount || gen.isPending || uploading} onClick={applySelection}>{uploading ? t('loading') : t('useSelected')}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 const MapCanvas = dynamic(() => import("@/components/map-canvas"), { ssr: false });
 
 function LocationPicker({ onSubmit }: { onSubmit: (loc: { address: string; lat: number; lng: number }) => void }) {
@@ -430,7 +275,7 @@ function LocationPicker({ onSubmit }: { onSubmit: (loc: { address: string; lat: 
   const [query, setQuery] = useState("");
   const [sel, setSel] = useState<{ address: string; lat: number; lng: number } | null>(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  
+
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 1000);
     return () => clearTimeout(t);
@@ -449,24 +294,24 @@ function LocationPicker({ onSubmit }: { onSubmit: (loc: { address: string; lat: 
   // Let's use `queryClient.fetchQuery` for the imperative map click.
   // But `useGeoReverse` hook is better for declarative.
   // Let's refactor: when map is clicked, set a temp state `clickedCoords`, which triggers the hook.
-  
+
   const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const reverse = useGeoReverse(clickedCoords?.lat ?? 0, clickedCoords?.lng ?? 0);
 
   useEffect(() => {
-      if (clickedCoords && reverse.data) {
-          const data = reverse.data;
-          let address = `${clickedCoords.lat.toFixed(5)}, ${clickedCoords.lng.toFixed(5)}`;
-          if (data?.results?.[0]?.formatted) {
-              address = data.results[0].formatted;
-          }
-          setSel({ address, lat: clickedCoords.lat, lng: clickedCoords.lng });
-          setClickedCoords(null); // Reset to stop fetching
+    if (clickedCoords && reverse.data) {
+      const data = reverse.data;
+      let address = `${clickedCoords.lat.toFixed(5)}, ${clickedCoords.lng.toFixed(5)}`;
+      if (data?.results?.[0]?.formatted) {
+        address = data.results[0].formatted;
       }
+      setSel({ address, lat: clickedCoords.lat, lng: clickedCoords.lng });
+      setClickedCoords(null); // Reset to stop fetching
+    }
   }, [clickedCoords, reverse.data]);
 
   function handleMapClick(lat: number, lng: number) {
-      setClickedCoords({ lat, lng });
+    setClickedCoords({ lat, lng });
   }
 
   return (
@@ -496,13 +341,13 @@ function LocationPicker({ onSubmit }: { onSubmit: (loc: { address: string; lat: 
 function EnhanceInline({ field, value, context, onDone }: { field: string; value: string; context?: any; onDone: (t: string) => void }) {
   const t = useTranslations('create');
   const enhance = useEnhanceText();
-  
+
   async function run() {
     if (!value.trim()) return;
     try {
-        const data: any = await enhance.mutateAsync({ field, text: value, context });
-        if (data.result) onDone(data.result);
-    } catch {}
+      const data: any = await enhance.mutateAsync({ field, text: value, context });
+      if (data.result) onDone(data.result);
+    } catch { }
   }
   return (
     <button className="rounded-xl bg-purple-600 px-3 py-3 text-white" disabled={enhance.isPending} onClick={run}>{enhance.isPending ? "..." : t('enhance')}</button>
@@ -523,7 +368,7 @@ import { InviteeForm } from "@/components/invitee-form";
 
 function PeopleBuilder({ people, onAdd, onRemove, onDone }: { people: Array<{ identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean; context?: string }>; onAdd: (p: { identifier: string; name?: string; age?: number; imageUrl?: string; isOrganizer?: boolean; context?: string }) => void; onRemove: (identifier: string) => void; onDone: () => void }) {
   const t = useTranslations('create');
-  
+
   return (
     <div className="space-y-3">
       <InviteeForm onAdd={onAdd} onDone={onDone} mode="builder" />
