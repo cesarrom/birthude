@@ -42,6 +42,7 @@ services:
       # NextAuth - external URL must be set via env
       NEXTAUTH_URL: ${NEXTAUTH_URL}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      AUTH_TRUSTED_HOSTS: ${AUTH_TRUSTED_HOSTS:-localhost:3000}
       
       # AI Services
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
