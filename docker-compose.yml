@@ -9,9 +9,6 @@ services:
     command: ["sh", "-c", "pnpm drizzle-kit migrate"]
     environment:
       POSTGRES_URL: ${POSTGRES_URL}
-    depends_on:
-      db:
-        condition: service_healthy
     networks:
       - shared_db_net
     # Run migrations and exit
