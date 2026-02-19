@@ -1,22 +1,6 @@
 version: "3.8"
 
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-birthude}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-birthude}
-      POSTGRES_DB: ${POSTGRES_DB:-birthude}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-birthude} -d ${POSTGRES_DB:-birthude}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    # No ports exposed - internal network only (Dokploy handles external access)
-
   # Database migrations
   migrate:
     build:
@@ -24,10 +8,12 @@ services:
       dockerfile: Dockerfile
     command: ["sh", "-c", "pnpm drizzle-kit migrate"]
     environment:
-      POSTGRES_URL: postgres://${POSTGRES_USER:-birthude}:${POSTGRES_PASSWORD:-birthude}@db:5432/${POSTGRES_DB:-birthude}
+      POSTGRES_URL: ${POSTGRES_URL}
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - shared_db_net
     # Run migrations and exit
 
   # Next.js Application
@@ -37,7 +23,7 @@ services:
       dockerfile: Dockerfile
     environment:
       # Database - uses internal Docker network
-      POSTGRES_URL: postgres://${POSTGRES_USER:-birthude}:${POSTGRES_PASSWORD:-birthude}@db:5432/${POSTGRES_DB:-birthude}
+      POSTGRES_URL: ${POSTGRES_URL}
       
       # NextAuth - external URL must be set via env
       NEXTAUTH_URL: ${NEXTAUTH_URL}
@@ -66,6 +52,12 @@ services:
         condition: service_completed_successfully
     # No ports exposed - Dokploy handles routing
     # The app listens on port 3000 internally
+    networks:
+      - shared_db_net
 
 volumes:
   postgres_data:
+networks:
+  shared_db_net:
+    external: true
+
