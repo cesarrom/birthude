@@ -1,8 +1,7 @@
-import { generateText, GeneratedFile, Output } from "ai";
+import { generateText, GeneratedFile } from "ai";
 import { openrouter } from "@/lib/ai";
 import sharp from "sharp";
 import { AssetToName } from "./types";
-import z from "zod";
 
 // ============================================================================
 // Types
@@ -58,13 +57,11 @@ async function processGeneratedImage(file: GeneratedFile): Promise<{ buffer: Buf
   let initialBuffer: Buffer;
 
   // Handle different potential structures of GeneratedFile
-  // @ts-ignore: Assuming content is Uint8Array or similar
-  if (file.uint8Array) {
-    // @ts-ignore
-    initialBuffer = Buffer.from(file.uint8Array);
-  } else if ('base64' in file) {
-    // @ts-ignore
-    initialBuffer = Buffer.from(file.base64, 'base64');
+  const maybe = file as unknown as { uint8Array?: unknown; base64?: unknown };
+  if (maybe.uint8Array instanceof Uint8Array) {
+    initialBuffer = Buffer.from(maybe.uint8Array);
+  } else if (typeof maybe.base64 === "string") {
+    initialBuffer = Buffer.from(maybe.base64, 'base64');
   } else {
     throw new Error("Unknown content format in GeneratedFile");
   }
@@ -162,36 +159,58 @@ async function processGeneratedImage(file: GeneratedFile): Promise<{ buffer: Buf
 // ============================================================================
 
 async function uploadToBytescale(buffer: Buffer): Promise<string> {
-  const accountId = process.env.BYTESCALE_ACCOUNT_ID;
-  const apiKey = process.env.BYTESCALE_API_KEY;
+  const baseUrl = process.env.CONTENTO_BASE_URL;
+  const projectId = process.env.CONTENTO_PROJECT_ID;
+  const projectSlug = process.env.CONTENTO_PROJECT_SLUG;
+  const apiKey = process.env.CONTENTO_API_KEY;
 
-  if (!accountId || !apiKey) {
-    throw new Error("Bytescale not configured");
+  if (!baseUrl || !projectId || !projectSlug || !apiKey) {
+    throw new Error("Contento not configured");
   }
 
-  // Derive a filename
-  const filename = `isolated-${Date.now()}.png`; // Assuming PNG from AI commonly
-  const endpoint = `https://api.bytescale.com/v2/accounts/${accountId}/uploads/binary`;
+  const filename = `isolated-${Date.now()}.png`;
+  const path = `/isolated/${filename}`;
 
-  const res = await fetch(endpoint, {
+  const signRes = await fetch(`${baseUrl.replace(/\/+$/, "")}/api/v1/projects/${projectId}/sign/upload`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
-      "X-Upload-Filename": filename,
-      // We don't strictly know content type without probing, but Bytescale handles binary.
-      // Better to probe with sharp if we want to be exact, but generic is often okay or defaults.
-      "Content-Type": "image/png",
+      "Content-Type": "application/json",
     },
-    body: buffer as any,
+    body: JSON.stringify({
+      path,
+      contentType: "image/png",
+    }),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Bytescale upload failed: ${res.status} ${text}`);
+  if (!signRes.ok) {
+    const text = await signRes.text();
+    throw new Error(`Contento sign upload failed: ${signRes.status} ${text}`);
   }
 
-  const json = await res.json();
-  return json.fileUrl;
+  const signJson = await signRes.json();
+  const uploadUrl = signJson?.data?.url;
+  const uploadMethod = String(signJson?.data?.method || "PUT").toUpperCase();
+  if (!uploadUrl || uploadMethod !== "PUT") {
+    throw new Error("Contento sign upload returned invalid response");
+  }
+
+  const uploadRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "image/png",
+    },
+    body: new Uint8Array(buffer),
+  });
+
+  if (!uploadRes.ok) {
+    const text = await uploadRes.text();
+    throw new Error(`Contento upload failed: ${uploadRes.status} ${text}`);
+  }
+
+  const normalizedBase = baseUrl.replace(/\/+$/, "");
+  const filePath = path.replace(/^\//, "");
+  return `${normalizedBase}/f/raw/${projectSlug}/${filePath}`;
 }
 
 // ============================================================================

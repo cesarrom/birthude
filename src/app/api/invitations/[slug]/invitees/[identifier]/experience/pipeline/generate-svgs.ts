@@ -1,7 +1,7 @@
 import { generateObject } from "ai";
 import { openrouter } from "@/lib/ai";
 import { z } from "zod";
-import type { CopyResult, GeneratedSVG, UploadedSVG } from "./types";
+import type { CopyResult, UploadedSVG } from "./types";
 
 const GeneratedSVGSchema = z.object({
   screenId: z.string().describe("ID of the screen this SVG is for"),
@@ -83,33 +83,66 @@ Create appropriate SVGs for each screen. Not every screen needs an SVG - focus o
 }
 
 async function uploadSVGToBytescale(svgContent: string, semanticName: string): Promise<string> {
-  const accountId = process.env.BYTESCALE_ACCOUNT_ID;
-  const apiKey = process.env.BYTESCALE_API_KEY;
+  const baseUrl = process.env.CONTENTO_BASE_URL;
+  const projectId = process.env.CONTENTO_PROJECT_ID;
+  const projectSlug = process.env.CONTENTO_PROJECT_SLUG;
+  const apiKey = process.env.CONTENTO_API_KEY;
 
-  if (!accountId || !apiKey) {
-    throw new Error("Bytescale not configured");
+  if (!baseUrl || !projectId || !projectSlug || !apiKey) {
+    throw new Error("Contento not configured");
   }
 
-  const endpoint = `https://api.bytescale.com/v2/accounts/${accountId}/uploads/binary`;
-  const buf = Buffer.from(svgContent, 'utf8');
+  const safeSemantic = String(semanticName || "asset")
+    .trim()
+    .replace(/\\/g, "-")
+    .replace(/\//g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "");
 
-  const res = await fetch(endpoint, {
+  const filename = `${safeSemantic || "asset"}-${Date.now()}.svg`;
+  const path = `/svgs/${filename}`;
+  const buf = Buffer.from(svgContent, "utf8");
+
+  const signRes = await fetch(`${baseUrl.replace(/\/+$/, "")}/api/v1/projects/${projectId}/sign/upload`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
-      "X-Upload-Filename": `${semanticName}-${Date.now()}.svg`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      path,
+      contentType: "image/svg+xml",
+    }),
+  });
+
+  if (!signRes.ok) {
+    const text = await signRes.text();
+    throw new Error(`Contento sign upload failed: ${signRes.status} ${text}`);
+  }
+
+  const signJson = await signRes.json();
+  const uploadUrl = signJson?.data?.url;
+  const uploadMethod = String(signJson?.data?.method || "PUT").toUpperCase();
+  if (!uploadUrl || uploadMethod !== "PUT") {
+    throw new Error("Contento sign upload returned invalid response");
+  }
+
+  const uploadRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
       "Content-Type": "image/svg+xml",
     },
     body: buf,
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Bytescale upload failed: ${res.status} ${text}`);
+  if (!uploadRes.ok) {
+    const text = await uploadRes.text();
+    throw new Error(`Contento upload failed: ${uploadRes.status} ${text}`);
   }
 
-  const json = await res.json();
-  return json.fileUrl;
+  const normalizedBase = baseUrl.replace(/\/+$/, "");
+  const filePath = path.replace(/^\//, "");
+  return `${normalizedBase}/f/raw/${projectSlug}/${filePath}`;
 }
 
 export async function generateSVGsFromCopy(copy: CopyResult): Promise<UploadedSVG[]> {
