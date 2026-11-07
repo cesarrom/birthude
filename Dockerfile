@@ -11,7 +11,7 @@ WORKDIR /app
 
 # COPY package.json pnpm-lock.yaml ./
 COPY package.json ./
-RUN pnpm install
+RUN npm install
 
 # Builder stage
 FROM base AS builder
